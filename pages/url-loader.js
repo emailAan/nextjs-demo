@@ -1,12 +1,8 @@
+import css from 'styled-jsx/css'
 import {withRouter} from 'next/router'
 
-export default withRouter((props) => (
-  <div>
-    <h1>{props.router.query.url}</h1>
-    <iframe src={props.router.query.url} />
-    <style jsx>
-      {`
-    iframe {
+let iframe = css`
+iframe {
         border: 0;
         min-width: calc(100% - 10px);
         min-height: calc(100% - 50px);
@@ -15,7 +11,12 @@ export default withRouter((props) => (
         overflow-x: hidden;
         overflow-y: hidden;
     }
-    `}
-    </style>
+`
+
+export default withRouter((props) => (
+  <div>
+    <h1>{props.router.query.url}</h1>
+    <iframe src={props.router.query.url} />
+    <style jsx>{iframe}</style>
   </div>
 ))
