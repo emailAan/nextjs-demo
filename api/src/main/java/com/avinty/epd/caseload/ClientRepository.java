@@ -1,4 +1,4 @@
-package com.avinty.epd;
+package com.avinty.epd.caseload;
 
 
 import java.util.List;

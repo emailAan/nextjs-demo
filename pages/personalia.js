@@ -25,7 +25,8 @@ let ListView = (props) => (
 
 class Caseload extends React.Component {
   static async getInitialProps ({ req }) {
-    let response = await fetch('http://localhost:8080/caseload')
+    let clientId = 4
+    let response = await fetch(`http://localhost:8080/client?id=${clientId}`)
     let caseload = await response.json()
 
     return { caseload }

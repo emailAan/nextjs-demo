@@ -1,9 +1,16 @@
 version: "2"
 services:
+  api:
+    container_name: api
+    image: avinty/avinty-epd-api:latest
+    ports:
+      - "8080:8080"
+    links:
+      - mongo
   mongo:
     container_name: mongo
     image: mongo
     volumes:
-      - ./data:/data/db
+      - /tmp/data:/data/db
     ports:
       - "27017:27017"

@@ -1,18 +1,19 @@
-package com.avinty.epd;
+package com.avinty.epd.personalia;
 
 import org.springframework.data.annotation.Id;
 
-public class Client {
+public class Personalia {
 
 	@Id
 	public String id;
 
 	public String firstName;
 	public String lastName;
+	
 
-	public Client() {}
+	public Personalia() {}
 
-	public Client(String firstName, String lastName) {
+	public Personalia(String firstName, String lastName) {
 	        this.firstName = firstName;
 	        this.lastName = lastName;
 	    }
@@ -21,5 +22,4 @@ public class Client {
 	public String toString() {
 		return String.format("Customer[id=%s, firstName='%s', lastName='%s']", id, firstName, lastName);
 	}
-
 }
