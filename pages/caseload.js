@@ -1,4 +1,5 @@
 import React, {Fragment} from 'react'
+import Link from 'next/link'
 import css from 'styled-jsx/css'
 import { withRouter } from 'next/router'
 
@@ -11,9 +12,9 @@ ul {
 }
 `
 
-let ListItem = ({label}) => (
+let ListItem = ({label, id}) => (
   <Fragment>
-    <li><span>{label}</span></li>
+    <li><Link as={`personalia/${id}`} href={`personalia?id=${id}`} ><a>{label}</a></Link></li>
   </Fragment>
 )
 
@@ -34,10 +35,9 @@ class Caseload extends React.Component {
   render () {
     return (
       <div>
-        <h1>Home</h1>
-        <p>Dit is de home page </p>
+        <h1>Caseload</h1>
         <ListView>
-          {this.props.caseload.map((c, i) => <ListItem key={i} label={c.firstName + ' ' + c.lastName} />)}
+          {this.props.caseload.map((c, i) => <ListItem key={i} id={c.id} label={c.firstName + ' ' + c.lastName} />)}
         </ListView>
       </div>
     )

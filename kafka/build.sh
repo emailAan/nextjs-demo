@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-docker build . --tag kafka-server
+docker build . --tag avinty/avinty-epd-kafka
