@@ -16,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.avinty.epd.caseload.Client;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping(path = "/personalia")
@@ -25,28 +29,37 @@ class PersonaliaService {
 	private PersonaliaRepository repository;
 
 	@Autowired
-	private KafkaTemplate<String, Personalia> kafkaTemplate;
+	private KafkaTemplate<String, String> kafkaTemplate;
 
 	@Value("${app.topic.client}")
 	private String topic;
-	
+
 	@PostMapping
 	@CrossOrigin(origins = "http://localhost:3000")
 	public void save(@RequestBody Personalia personalia) {
 		repository.save(personalia);
-		kafkaTemplate.send(topic, personalia);
+
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			String p = mapper.writeValueAsString(personalia);
+			kafkaTemplate.send(topic, p);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@GetMapping("/all")
 	public List<Personalia> get() {
 		return repository.findAll();
 	}
-	
+
 	@GetMapping("/{id}")
 	@CrossOrigin(origins = "http://localhost:3000")
 	public Personalia get(@PathVariable String id) {
 		Optional<Personalia> res = repository.findById(id);
-		
+
 		return res.isPresent() ? res.get() : null;
 	}
 }

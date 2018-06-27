@@ -33,7 +33,6 @@ class CaseloadService {
 
 	@KafkaListener(topics = "client.t", groupId = "client")
 	public void receive(@Payload String data) throws JsonParseException, JsonMappingException, IOException {
-		System.out.println("client mutatie: " + data);
 		ObjectMapper mapper = new ObjectMapper();
 		Client p = mapper.readValue(data, Client.class);
 		save(p);
