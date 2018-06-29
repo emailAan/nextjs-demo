@@ -13,10 +13,12 @@ iframe {
 }
 `
 
-export default withRouter((props) => (
-  <div>
-    <h1>{props.router.query.url}</h1>
-    <iframe src={props.router.query.url} />
-    <style jsx>{iframe}</style>
-  </div>
-))
+export default withRouter(
+  (props) => (
+    <div>
+      <h1>{props.router.query.url}</h1>
+      <iframe src={props.router.query.url} />
+      <style jsx>{iframe}</style>
+    </div>
+  )
+)

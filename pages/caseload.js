@@ -1,27 +1,18 @@
-import React, {Fragment} from 'react'
-import Link from 'next/link'
-import css from 'styled-jsx/css'
-import { withRouter } from 'next/router'
+import React from 'react'
+import Router, { withRouter } from 'next/router'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemText from '@material-ui/core/ListItemText'
 
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
 
-let listviewStyle = css`
-ul {
-    color: #000;
-}
-`
-
-let ListItem = ({label, id}) => (
-  <Fragment>
-    <li><Link as={`personalia/${id}`} href={`personalia?id=${id}`} ><a>{label}</a></Link></li>
-  </Fragment>
+let CaseloadListItem = ({label, id}) => (
+  <ListItem divider button onClick={() => Router.push(`/personalia?id=${id}`, `/personalia/${id}`)}><ListItemText>{label}</ListItemText></ListItem>
 )
 
 let ListView = (props) => (
-  <div><ul>{props.children}</ul>
-    <style jsx>{listviewStyle}</style>
-  </div>
+  <List>{props.children}</List>
 )
 
 class Caseload extends React.Component {
@@ -33,11 +24,12 @@ class Caseload extends React.Component {
   }
 
   render () {
+    let {caseload} = this.props
     return (
       <div>
         <h1>Caseload</h1>
         <ListView>
-          {this.props.caseload.map((c, i) => <ListItem key={i} id={c.id} label={c.firstName + ' ' + c.lastName} />)}
+          { caseload ? caseload.map((c, i) => <CaseloadListItem key={i} id={c.id} label={c.firstName + ' ' + c.lastName} />) : null }
         </ListView>
       </div>
     )

@@ -1,5 +1,10 @@
 import React from 'react'
 import {withRouter} from 'next/router'
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+
+require('es6-promise').polyfill()
+require('isomorphic-fetch')
 
 class Personalia extends React.Component {
   static async getInitialProps ({query}) {
@@ -8,7 +13,7 @@ class Personalia extends React.Component {
     try {
       personalia = (response) ? await response.json() : null
     } catch (ee) {
-      personalia = {}
+      personalia = {lastName: '', firstName: ''}
     }
 
     return { personalia }
@@ -41,8 +46,6 @@ class Personalia extends React.Component {
   }
 
   save () {
-    console.log('saving to api: ', JSON.stringify(this.state.personalia))
-
     fetch('http://localhost:8080/personalia/',
       {
         headers: {
@@ -55,24 +58,21 @@ class Personalia extends React.Component {
       .then(function (res) { console.log(res) })
       .catch(function (res) { console.log(res) })
   }
-
   render () {
     return (
       <div>
         <h1>Personalia: {this.props.personalia.firstName}</h1>
         <form onSubmit={this.handleSubmit}>
-          <label>
-          voornaam
-            <input type='text' value={this.state.personalia.firstName} onChange={this.handleChangeFirstName} />
-          </label>
+          <TextField
+            label='Voornaam'
+            type='text' value={this.state.personalia.firstName} onChange={this.handleChangeFirstName} />
           <br />
-          <label>
-          achternaam
-            <input type='text' value={this.state.personalia.lastName} onChange={this.handleChangeLastName} />
-          </label>
+          <TextField
+            label='Achternaam'
+            type='text' value={this.state.personalia.lastName} onChange={this.handleChangeLastName} />
           <br />
           <br />
-          <input type='submit' value='Submit' onClick={this.save} />
+          <Button variant='contained' color='primary' onClick={this.save}>Opslaan</Button>
         </form>
 
       </div>

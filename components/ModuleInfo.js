@@ -1,7 +1,8 @@
 
 let modulesInfo = {}
 
-modulesInfo['url-loader'] = fetchModuleInfo('url-loader')
+console.log('disabled prefetching url-loader')
+// modulesInfo['url-loader'] = fetchModuleInfo('url-loader')
 
 export async function fetchModuleInfo (module, subModule) {
   if (!module) {
