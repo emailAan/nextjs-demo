@@ -1,10 +1,14 @@
-version: "2"
+version: '3.1' 
+# version: "2"
 services:
   api:
-    container_name: api
+    # container_name: api
     image: avinty/avinty-epd-api:latest
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080"
+    labels:
+      - "traefik.domain=localhost"
+      - "traefik.frontend.rule=Host:api.localhost"
     links:
       - mongo
       - kafka
@@ -13,26 +17,39 @@ services:
     image: mongo
     # volumes:
     #   - c:/temp/data:/data/db
-    ports:
-      - "27017:27017"
+    # ports:
+    #   - "27017:27017"
   kafka:
-    container_name: kafka
+    # container_name: kafka
     image: avinty/avinty-epd-kafka:latest
     ports:
       - "2181:2181"
       - "9092:9092"
   adfsso:
-    container_name: adfsso
+    # container_name: adfsso
     image: avinty/avinty-epd-adfsso:latest
   agenda:
-    container_name: agenda
+    # container_name: agenda
     image: avinty/avinty-epd-agenda:latest
   main:
-    container_name: main
+    # container_name: main
     image: avinty/avinty-epd-main:latest
-    ports:
-      - "80:3000"
+    labels:
+      - "traefik.frontend.rule=Host:localhost"
+    # ports:
+    #   - "3000:3000"
     links:
       - api
       - adfsso
       - agenda
+  #The reverse proxy service (Træfik)
+  reverse-proxy:
+    image: traefik #The official Traefik docker image
+    command: --api --docker #Enables the web UI and tells Træfik to listen to docker
+    labels:
+      - "traefik.domain=localhost"
+    ports:
+      - "80:80"     #The HTTP port
+      - "8081:8080" #The Web UI (enabled by --api)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock #So that Traefik can listen to the Docker events

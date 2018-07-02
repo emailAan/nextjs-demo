@@ -7,8 +7,8 @@ require('es6-promise').polyfill()
 require('isomorphic-fetch')
 
 class Personalia extends React.Component {
-  static async getInitialProps ({query}) {
-    let response = await fetch(`http://localhost:8080/personalia/${query.id}`)
+  static async getInitialProps ({query, req}) {
+    let response = await fetch(`http://${req ? 'api:8080' : 'api.localhost'}/personalia/${query.id}`)
     let personalia
     try {
       personalia = (response) ? await response.json() : null
@@ -46,7 +46,7 @@ class Personalia extends React.Component {
   }
 
   save () {
-    fetch('http://localhost:8080/personalia/',
+    fetch('http://api.localhost/personalia/',
       {
         headers: {
           'Accept': 'application/json',

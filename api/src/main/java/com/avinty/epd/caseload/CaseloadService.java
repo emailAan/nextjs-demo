@@ -25,7 +25,7 @@ class CaseloadService {
 	@Autowired
 	private ClientRepository repository;
 
-	@CrossOrigin(origins = {"http://localhost:80","http://localhost:3000","http://localhost:8080","http://localhost"})
+	@CrossOrigin(origins = "*")
 	@RequestMapping(path = "/caseload")
 	public List<Client> caseload() {
 		return repository.findAll();
