@@ -1,9 +1,11 @@
 const express = require('express')
 const next = require('next')
+const proxy = require('http-proxy-middleware')
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
+const port = 3000
 
 app.prepare()
   .then(() => {
@@ -21,13 +23,34 @@ app.prepare()
       app.render(req, res, actualPage, queryParams)
     })
 
+    const MODULE_PREFIX = 'modules'
+    const MODULE_PORT = 3000
+
+    var modules = proxy(`/${MODULE_PREFIX}`, {
+      target: `http://${MODULE_PREFIX}:${MODULE_PORT}/`,
+      pathRewrite:
+        function (path, req) {
+          var moduleHost = req.originalUrl.split('/')[2]
+          console.log(path.replace(`/${MODULE_PREFIX}/${moduleHost}`, ''))
+          return path.replace(`/${MODULE_PREFIX}/${moduleHost}`, '')
+        },
+      router: function (req) {
+        var moduleHost = req.originalUrl.split('/')[2]
+        console.log(`http://${moduleHost}:${MODULE_PORT}`)
+        return `http://${moduleHost}:${MODULE_PORT}`
+      },
+      changeOrigin: true
+    })
+
+    server.use(modules)
+
     server.get('*', (req, res) => {
       return handle(req, res)
     })
 
-    server.listen(3000, (err) => {
+    server.listen(port, (err) => {
       if (err) throw err
-      console.log('> Ready on http://localhost:3000')
+      console.log(`> Ready on http://localhost:${port}`)
     })
   })
   .catch((ex) => {

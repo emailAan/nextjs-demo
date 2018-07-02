@@ -21,7 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:80","http://localhost:3000","http://localhost:8080","http://localhost"})
 @RequestMapping(path = "/personalia")
 class PersonaliaService {
 
@@ -35,7 +35,7 @@ class PersonaliaService {
 	private String topic;
 
 	@PostMapping
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = {"http://localhost:80","http://localhost:3000","http://localhost:8080","http://localhost"})
 	public void save(@RequestBody Personalia personalia) {
 		repository.save(personalia);
 
@@ -56,7 +56,7 @@ class PersonaliaService {
 	}
 
 	@GetMapping("/{id}")
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = {"http://localhost:80","http://localhost:3000","http://localhost:8080","http://localhost"})
 	public Personalia get(@PathVariable String id) {
 		Optional<Personalia> res = repository.findById(id);
 

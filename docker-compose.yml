@@ -21,3 +21,18 @@ services:
     ports:
       - "2181:2181"
       - "9092:9092"
+  adfsso:
+    container_name: adfsso
+    image: avinty/avinty-epd-adfsso:latest
+  agenda:
+    container_name: agenda
+    image: avinty/avinty-epd-agenda:latest
+  main:
+    container_name: main
+    image: avinty/avinty-epd-main:latest
+    ports:
+      - "80:3000"
+    links:
+      - api
+      - adfsso
+      - agenda

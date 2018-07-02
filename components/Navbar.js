@@ -340,27 +340,6 @@ let tilesStyle = css`
 .refreshNav img {
     width: 23px;
 }
-/*.tileSize1x1 > div > div > span > div > div:first-child > span {
-right:-155px;
-}
-
-
-.tileSize1x2 > div > div > span > div > div:first-child > span {
-right:-155px;
-}
-
-.tileSize2x2 > div > div > span > div > div:first-child > span {
-right:-325px;
-}
-
-.tileSize2x1 > div > div > span > div > div:first-child > span {
-right:-325px;
-}
-
-.tileSize2x2 > div > div > span > div > div:nth-child(2) > span {
-    margin-top: 200px;
-    position: absolute;
-}*/
 .tileSize1x2 {
     position: relative;
     max-width: 160px !important;

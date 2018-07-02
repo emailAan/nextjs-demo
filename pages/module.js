@@ -11,7 +11,7 @@ export default withRouter(
 
     async mountModule () {
       const node = this.mountPointRef.current
-      const importedModule = await window.SystemJS.import('http://localhost:9001/agenda.js')
+      const importedModule = await window.SystemJS.import('/modules/agenda/agenda.js')
       const Comp = importedModule.default
 
       ReactDOM.render(<Comp customProps={{}} />, node)
