@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 services:
   api:
     container_name: api
@@ -21,9 +21,9 @@ services:
     ports:
       - "2181:2181"
       - "9092:9092"
-  adfsso:
-    container_name: adfsso
-    image: avinty/avinty-epd-adfsso:latest
+  # adfsso:
+  #   container_name: adfsso
+  #   image: avinty/avinty-epd-adfsso:latest
   agenda:
     container_name: agenda
     image: avinty/avinty-epd-agenda:latest
@@ -34,5 +34,5 @@ services:
       - "80:3000"
     links:
       - api
-      - adfsso
+      # - adfsso
       - agenda
