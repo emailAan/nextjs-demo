@@ -1,33 +1,60 @@
 import React, {Fragment} from 'react'
 import Router from 'next/router'
-import { fetchModuleInfo } from './ModuleInfo'
+// import { fetchModuleInfo } from './ModuleInfo'
 import css from 'styled-jsx/css'
 
-async function fetchCounterAsync (e, navbarInstance) {
-  let moduleInfo = await fetchModuleInfo(e.module, e.subModule)
+const navBarStyle = css`
+li:hover {
+    background-color: #4b555f;
+}      
+li {
+    padding-top: 14px;
+    padding-bottom: -14px;
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 100%;
+}      
+li.second {
+    background-color: #4b555f;
+}      
+li.second:hover {
+    background-color: #36404d;
+}      
+li:hover {
+    color: black;
+}      
+a {
+    height: 100%;
+    text-decoration: none;
+    color: white;
+}      
+`
 
-  if (!moduleInfo || !moduleInfo.counter) {
-    return
-  }
+// async function fetchCounterAsync (e, navbarInstance) {
+//   let moduleInfo = await fetchModuleInfo(e.module, e.subModule)
 
-  const response = await fetch(moduleInfo.counter)
+//   if (!moduleInfo || !moduleInfo.counter) {
+//     return
+//   }
 
-  let counter = await response.json()
-  navbarInstance.updateNavItemWithCounter(e, counter.count)
-}
+//   const response = await fetch(moduleInfo.counter)
 
-function fetchCounters (navData, navbarInstance) {
-  if (!navData) {
-    return
-  }
+//   let counter = await response.json()
+//   navbarInstance.updateNavItemWithCounter(e, counter.count)
+// }
 
-  navData.map((e) => {
-    if (e.children) {
-      fetchCounters(e.children, navbarInstance)
-    }
-    return fetchCounterAsync(e, navbarInstance)
-  })
-}
+// function fetchCounters (navData, navbarInstance) {
+//   if (!navData) {
+//     return
+//   }
+
+//   navData.map((e) => {
+//     if (e.children) {
+//       fetchCounters(e.children, navbarInstance)
+//     }
+//     return fetchCounterAsync(e, navbarInstance)
+//   })
+// }
 
 let NavLink = ({entry, lvl, action}) => (
   <Fragment>
@@ -37,32 +64,7 @@ let NavLink = ({entry, lvl, action}) => (
         {entry.counter ? <span className='counter' >{entry.counter}</span> : null }
       </li>
     </a>
-    <style jsx>{`
-      .navbar li:hover {
-          background-color: #4b555f;
-      }      
-      .navbar li {
-          padding-top: 14px;
-          padding-bottom: -14px;
-          padding-left: 10px;
-          padding-right: 10px;
-          height: 100%;
-      }      
-      .navbar li.second {
-          background-color: #4b555f;
-      }      
-      .navbar li.second:hover {
-          background-color: #36404d;
-      }      
-      .navbar li:hover {
-          color: black;
-      }      
-      .navbar a {
-          height: 100%;
-          text-decoration: none;
-          color: white;
-      }      
-        `}
+    <style jsx>{navBarStyle}
     </style>
   </Fragment>
 )

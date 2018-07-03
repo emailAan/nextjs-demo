@@ -3,6 +3,7 @@ import Router, { withRouter } from 'next/router'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
+import Typography from '@material-ui/core/Typography'
 
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
@@ -15,6 +16,10 @@ let ListView = (props) => (
   <List>{props.children}</List>
 )
 
+const renderCaseloadItem = (c, i) => <CaseloadListItem
+  key={i} id={c.id}
+  label={`${c.firstName} ${c.lastName}`} />
+
 class Caseload extends React.Component {
   static async getInitialProps ({ req }) {
     let response = await fetch(`http://${req ? 'api:8080' : 'api.localhost'}/caseload`)
@@ -26,12 +31,12 @@ class Caseload extends React.Component {
   render () {
     let {caseload} = this.props
     return (
-      <div>
-        <h1>Caseload</h1>
+      <React.Fragment>
+        <Typography variant='headline' gutterBottom>Caseload</Typography>
         <ListView>
-          { caseload ? caseload.map((c, i) => <CaseloadListItem key={i} id={c.id} label={c.firstName + ' ' + c.lastName} />) : null }
+          { caseload ? caseload.map(renderCaseloadItem) : null }
         </ListView>
-      </div>
+      </React.Fragment>
     )
   }
 }

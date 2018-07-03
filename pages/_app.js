@@ -5,9 +5,9 @@ import App, { Container } from 'next/app'
 import withRedux from 'next-redux-wrapper'
 import css from 'styled-jsx/css'
 
-import { MuiThemeProvider } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import JssProvider from 'react-jss/lib/JssProvider';
+import { MuiThemeProvider } from '@material-ui/core/styles'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import JssProvider from 'react-jss/lib/JssProvider'
 import NavBar from '../components/Navbar'
 import getPageContext from '../components/getPageContext'
 
@@ -61,14 +61,14 @@ const makeStore = (initialState, options) => {
 }
 
 class CustomApp extends App {
-  constructor(props) {
-    super(props);
-    this.pageContext = getPageContext();
+  constructor (props) {
+    super(props)
+    this.pageContext = getPageContext()
   }
 
   pageContext = null;
 
-  static async getInitialProps({ Component, ctx }) {
+  static async getInitialProps ({ Component, ctx }) {
     const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {}
 
     // let response = await fetch('http://localhost:8081/api/navigation')
@@ -78,17 +78,15 @@ class CustomApp extends App {
     return { pageProps, navData }
   }
 
-
-
-  componentDidMount() {
+  componentDidMount () {
     // Remove the server-side injected CSS.
-    const jssStyles = document.querySelector('#jss-server-side');
+    const jssStyles = document.querySelector('#jss-server-side')
     if (jssStyles && jssStyles.parentNode) {
-      jssStyles.parentNode.removeChild(jssStyles);
+      jssStyles.parentNode.removeChild(jssStyles)
     }
   }
 
-  render() {
+  render () {
     const { Component, pageProps, store } = this.props
     return (
       <Container>
@@ -115,7 +113,7 @@ class CustomApp extends App {
             </div>
             <div className='content'>
               <Provider store={store}>
-                <Component pageContext={this.pageContext}  {...pageProps} />
+                <Component pageContext={this.pageContext} {...pageProps} />
               </Provider>
             </div>
             <NavBar navData={this.props.navData} />
