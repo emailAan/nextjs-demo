@@ -1,6 +1,7 @@
 package com.avinty.epd.caseload;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 class CaseloadService {
+	
+	public static AtomicInteger i = new AtomicInteger();
 
 	@Autowired
 	private ClientRepository repository;
@@ -28,7 +31,14 @@ class CaseloadService {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(path = "/caseload")
 	public List<Client> caseload() {
+		i.getAndIncrement();
 		return repository.findAll();
+	}
+
+	@CrossOrigin(origins = "*")
+	@RequestMapping(path = "/count")
+	public Integer count() {
+		return i.get();
 	}
 
 	@KafkaListener(topics = "client.t", groupId = "client")
