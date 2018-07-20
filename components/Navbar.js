@@ -4,6 +4,47 @@ import Router from 'next/router'
 import css from 'styled-jsx/css'
 
 const navBarStyle = css`
+/* width */
+div.navbar::-webkit-scrollbar {
+    width: 10px;
+}
+/* Track */
+div.navbar::-webkit-scrollbar-track {
+    background: #5c646c; 
+}
+/* Handle */
+div.navbar::-webkit-scrollbar-thumb {
+    background: #4b555f; 
+}
+/* Handle on hover */
+div.navbar::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}
+
+.navbar {
+  font-family: Arial, Helvetica, sans-serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #5c646c;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  width: 150px;
+  height: 100%;
+  align-items: center;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.navbar ul {
+  align-items: center;
+  list-style-type: none;
+  padding: 0;
+}
+`
+
+const navBarItemStyle = css`
 li:hover {
     background-color: #4b555f;
 }      
@@ -64,7 +105,7 @@ let NavLink = ({entry, lvl, action}) => (
         {entry.counter ? <span className='counter' >{entry.counter}</span> : null }
       </li>
     </a>
-    <style jsx>{navBarStyle}
+    <style jsx>{navBarItemStyle}
     </style>
   </Fragment>
 )
@@ -72,6 +113,7 @@ let NavLink = ({entry, lvl, action}) => (
 class Navbar extends React.Component {
   constructor (props) {
     super(props)
+
     this.state = {navData: props.navData, tiles: props.navData}
   }
 
@@ -121,7 +163,8 @@ class Navbar extends React.Component {
   }
 
   go (page) {
-    Router.push(`/${page}`, `/${page}`)
+    const baseline = `/d/${this.props.dashboardId}`
+    Router.push(`${baseline}/${page}`, `${baseline}/${page}`)
     this.hideTiles()
     // window.location = `/${page}`
   }
@@ -137,8 +180,12 @@ class Navbar extends React.Component {
 
   tileAction (e) {
     if (e.module) {
-      this.hideTiles()
-      window.location = `/${e.label.replace(' ', '')}`
+      const moduleId = e.label.replace(' ', '')
+
+      Router.push({
+        pathname: '/dashboard',
+        query: { id: this.props.dashboardId, module: moduleId }
+      }, `${moduleId}`)
     } else {
       this.showTiles(e.children)
       window.location = '#'
@@ -156,80 +203,7 @@ class Navbar extends React.Component {
           <NavLink entry={{label: 'Nieuwe client'}} action={this.go.bind(this, 'personalia')} lvl={1} />
           {this.renderEntries(navData)}
         </ul>
-        <style jsx>{`
-/* width */
-div.navbar::-webkit-scrollbar {
-    width: 10px;
-}
-/* Track */
-div.navbar::-webkit-scrollbar-track {
-    background: #5c646c; 
-}
-/* Handle */
-div.navbar::-webkit-scrollbar-thumb {
-    background: #4b555f; 
-}
-/* Handle on hover */
-div.navbar::-webkit-scrollbar-thumb:hover {
-    background: #555; 
-}
-
-        .navbar {
-          font-family: Arial, Helvetica, sans-serif;
-          position: fixed;
-          top: 0;
-          left: 0;
-          background-color: #5c646c;
-          color: white;
-          font-size: 14px;
-          font-weight: bold;
-          width: 250px;
-          height: 100%;
-          /* display: flex; */
-          align-items: center;
-          overflow-y: scroll;
-          overflow-x: hidden;
-      }
-      
-      .navbar ul {
-          /* display: flex; */
-          align-items: center;
-          list-style-type: none;
-          padding: 0;
-          /* height: 100%; */
-      }
-      
-      .navbar li:hover {
-          background-color: #4b555f;
-      }
-      
-      .navbar li {
-          padding-top: 14px;
-          padding-bottom: -14px;
-          padding-left: 10px;
-          padding-right: 10px;
-          height: 100%;
-      }
-      
-      .navbar li.second {
-          background-color: #4b555f;
-      }
-      
-      .navbar li.second:hover {
-          background-color: #36404d;
-      }
-      
-      .navbar li:hover {
-          color: black;
-      }
-      
-      .navbar a {
-          height: 100%;
-          text-decoration: none;
-          color: white;
-      }      
-        `}
-        </style>
+        <style jsx>{navBarStyle}</style>
       </div>
     )
   }

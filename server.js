@@ -17,6 +17,36 @@ app.prepare()
       app.render(req, res, actualPage, queryParams)
     })
 
+    server.get('/d/:id/:module', (req, res) => {
+      const actualPage = '/dashboard'
+      const queryParams = { id: req.params.id, module: req.params.module }
+      app.render(req, res, actualPage, queryParams)
+    })
+
+    server.get('/d/:id', (req, res) => {
+      const actualPage = '/dashboard'
+      const queryParams = { id: req.params.id }
+      app.render(req, res, actualPage, queryParams)
+    })
+
+    const dashboardData = {}
+    dashboardData['4H7V9A2S'] = {
+      title: 'Medewerker dashboard',
+      navData: [
+        {label: 'caseload', module: true},
+        {label: 'agenda', module: true}
+      ]
+    }
+    dashboardData['3JHD4GT5'] = {
+      title: 'Client dashboard',
+      navData: [
+        {label: 'agenda', module: true},
+        {label: 'personalia', module: true}
+      ]
+    }
+
+    server.get('/api/dashboard/:variables', (req, res) => res.status(200).send(dashboardData[req.params.variables]))
+
     server.get('/personalia/:id', (req, res) => {
       const actualPage = '/personalia'
       const queryParams = { id: req.params.id }

@@ -1,4 +1,34 @@
 # nextjs-demo
+
+## Uitgangspunten
+
+ * Browser-state bewaren, maar na sluiten van de browser-tab moet de state opgeruimd zijn. -> sessionStorage
+ * De authenticatie moet wel bewaard worden, ook na het sluiten van de browser (JWT-token) -> localStorage
+ * De applicatie moet te 'bookmarken' zijn. Het huidige dashboad inclusief de geopende module.
+ * Zoveel mogelijk 'pretty-url' (in de adresbalk) en zo weinig mogelijk info voor hackers. -> mogelijk een url genereren en bewaren in db/cache (redis?)
+ * Meerdere dashboards tegelijk open, (natuurlijk) een zichtbaar.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Metrics
 └─ $ ▶ loadtest -t 20 -c 20 --rps 550 http://localhost/home
 [Mon Jul 02 2018 21:11:58 GMT+0200 (Central European Summer Time)] INFO Requests: 0, requests per second: 0, mean latency: 0 ms
 [Mon Jul 02 2018 21:12:03 GMT+0200 (Central European Summer Time)] INFO Requests: 2452, requests per second: 491, mean latency: 19.9 ms
@@ -50,4 +80,7 @@
 [Mon Jul 02 2018 21:18:31 GMT+0200 (Central European Summer Time)] INFO   95%      121 ms
 [Mon Jul 02 2018 21:18:31 GMT+0200 (Central European Summer Time)] INFO   99%      148 ms
 [Mon Jul 02 2018 21:18:31 GMT+0200 (Central European Summer Time)] INFO  100%      184 ms (longest request)
+
+
+
 
