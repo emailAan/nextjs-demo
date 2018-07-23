@@ -62,10 +62,6 @@ class Dashboard extends React.Component {
     this.state = {}
   }
 
-  componentDidMount () {
-    console.log('Dashboard is mounted')
-  }
-
   loadDashboard () {
     return <span>dashboard...</span>
   }

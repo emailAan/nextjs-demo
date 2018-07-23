@@ -1,5 +1,7 @@
 import React, {Fragment} from 'react'
 import css from 'styled-jsx/css'
+import { observer } from 'mobx-react'
+import { observable, action } from 'mobx'
 
 let contentCss = css`
 div.content  {
@@ -27,15 +29,15 @@ span.brandTitle {
   font-size: 46px;
 }
 `
-const Header = ({title, subTitle}) => (
+const Header = observer(({title, subTitle, state}) => (
   <Fragment>
     <div className='top'>
-      <span className='brandTitle' >Avinty</span>
-      <span>ZORGVERNIEUWERS NET ALS JIJ</span>
+      <span className='brandTitle' >{`${title} - ${state.count}`}</span>
+      <span>{subTitle}</span>
     </div>
     <style jsx>{headerCss}</style>
   </Fragment>
-)
+))
 
 const Content = ({contentChildren}) => (
   <Fragment>
@@ -46,9 +48,25 @@ const Content = ({contentChildren}) => (
   </Fragment>
 )
 
-export default ({content}) => (
-  <Fragment>
-    <Header title='Avinty' subTitle='ZORGVERNIEUWERS NET ALS JIJ' />
-    <Content contentChildren={content} />
-  </Fragment>
-)
+class AppUIState {
+@observable count
+
+constructor () {
+  this.count = 0
+}
+
+@action inc () {
+  this.count++
+}
+}
+
+export default ({content}) => {
+  let appUIState = new AppUIState()
+
+  return (
+    <Fragment>
+      <Header state={appUIState} title='Avinty' subTitle='ZORGVERNIEUWERS NET ALS JIJ' />
+      <Content contentChildren={content} />
+    </Fragment>
+  )
+}
