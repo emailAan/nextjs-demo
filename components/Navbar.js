@@ -1,25 +1,20 @@
 import React, {Fragment} from 'react'
-import Router from 'next/router'
 import css from 'styled-jsx/css'
+import { inject } from 'mobx-react'
 
-const navBarStyle = css`
-/* width */
+const navbarStyle = css`
 div.navbar::-webkit-scrollbar {
     width: 10px;
 }
-/* Track */
 div.navbar::-webkit-scrollbar-track {
     background: #5c646c; 
 }
-/* Handle */
 div.navbar::-webkit-scrollbar-thumb {
     background: #4b555f; 
 }
-/* Handle on hover */
 div.navbar::-webkit-scrollbar-thumb:hover {
     background: #555; 
 }
-
 .navbar {
   font-family: Arial, Helvetica, sans-serif;
   position: fixed;
@@ -35,7 +30,6 @@ div.navbar::-webkit-scrollbar-thumb:hover {
   overflow-y: scroll;
   overflow-x: hidden;
 }
-
 .navbar ul {
   align-items: center;
   list-style-type: none;
@@ -43,7 +37,7 @@ div.navbar::-webkit-scrollbar-thumb:hover {
 }
 `
 
-const navBarItemStyle = css`
+const navLinkStyle = css`
 li:hover {
     background-color: #4b555f;
 }      
@@ -70,19 +64,26 @@ a {
 }      
 `
 
-let NavLink = ({entry, lvl, action}) => (
+export let NavLink = ({entry, lvl, action, selected}) => (
   <Fragment>
     <a onClick={action}>
-      <li className={lvl > 1 ? 'second' : ''} >
+      <li style={selected ? {fontStyle: 'italic'} : {}} className={lvl > 1 ? 'second' : ''} >
         <span>{entry.label}</span>
         {entry.counter ? <span className='counter' >{entry.counter}</span> : null }
       </li>
     </a>
-    <style jsx>{navBarItemStyle}
-    </style>
+    <style jsx>{navLinkStyle}</style>
   </Fragment>
 )
 
+const NavbarContainer = ({children}) => (
+  <div className='navbar' >
+    <ul>{children}</ul>
+    <style jsx>{navbarStyle}</style>
+  </div>
+)
+
+@inject('dashboard', 'openContent')
 class Navbar extends React.Component {
   constructor (props) {
     super(props)
@@ -95,7 +96,7 @@ class Navbar extends React.Component {
       <Fragment>{
         entries ? entries.map((entry, i) => (
           <Fragment key={i}>
-            <NavLink action={this.tileAction.bind(this, entry)} entry={entry} lvl={lvl} />
+            <NavLink action={this.navigationAction.bind(this, entry)} entry={entry} lvl={lvl} />
             {
               entry.children ? this.renderEntries(entry.children, lvl + 1) : null
             }
@@ -107,55 +108,68 @@ class Navbar extends React.Component {
     )
   }
 
-  goHome () {
-    this.go('home')
-  }
-
   go (page) {
-    const baseline = `/d/${this.props.dashboardId}`
-    Router.push(`${baseline}/${page}`, `${baseline}/${page}`)
+    this.props.openContent(page, {c: 12, i: 1})
   }
 
-  showTiles (children) {
-    Router.push(`/dash`, `/dash`)
-  }
-
-  tileAction (e) {
-    if (e.module) {
-      const moduleId = e.label.replace(' ', '')
-
-      Router.push({
-        pathname: '/dashboard',
-        query: { id: this.props.dashboardId, module: moduleId }
-      }, `${moduleId}`)
+  navigationAction (item) {
+    if (item.module) {
+      this.props.openContent(item.id, item.parameters)
     } else {
       window.location = '#'
     }
   }
 
-  renderNavBar (navData) {
-    return (
-      <div className='navbar' >
-        <ul>
-          <NavLink entry={{label: 'Welcome'}} action={this.go.bind(this, '')} lvl={1} />
-          <NavLink entry={{label: 'Home'}} action={this.goHome.bind(this)} lvl={1} />
-          <NavLink entry={{label: 'Caseload'}} action={this.go.bind(this, 'caseload')} lvl={1} />
-          <NavLink entry={{label: 'Agenda React'}} action={this.go.bind(this, 'module')} lvl={1} />
-          <NavLink entry={{label: 'Nieuwe client'}} action={this.go.bind(this, 'personalia')} lvl={1} />
-          {this.renderEntries(navData)}
-        </ul>
-        <style jsx>{navBarStyle}</style>
-      </div>
-    )
+  addSelectedToChildren (children) {
+    return React.Children.map(children, (child) => {
+      if (!child) {
+        return child
+      }
+      if (!child.props) {
+        return child
+      }
+
+      let selected = (child.props.entry)
+        ? child.props.entry.id === this.props.dashboard.module
+        : false
+
+      // If current component has additional children, traverse through them as well!
+      if (child.props.children) {
+        return React.cloneElement(child, {
+          children: this.addSelectedToChildren(child.props.children),
+          selected
+        })
+      }
+
+      return React.cloneElement(child, { selected })
+    })
+  }
+
+  traverse (comp, fn) {
+    this.addSelectedToChildren(comp)
   }
 
   render () {
-    let {navData} = this.state
+    let {navData} = this.props.dashboard
 
     return (
-      <Fragment>
-        {this.renderNavBar(navData)}
-      </Fragment>
+      <NavbarContainer>
+        { this.addSelectedToChildren(this.props.stickyItems)}
+        {
+          this.addSelectedToChildren(
+            <Fragment>
+              <NavLink entry={{label: 'Caseload', id: 'caseload'}}
+                action={this.go.bind(this, 'caseload')} />
+              <NavLink entry={{label: 'Agenda', id: 'agenda'}}
+                action={this.go.bind(this, 'module')} />
+              <NavLink entry={{label: 'Personalia', id: 'personalia'}}
+                action={this.go.bind(this, 'personalia')} />
+            </Fragment>
+          )
+        }
+        <br />
+        {this.addSelectedToChildren(this.renderEntries(navData))}
+      </NavbarContainer>
     )
   }
 }

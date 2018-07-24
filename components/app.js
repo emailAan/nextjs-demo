@@ -29,15 +29,15 @@ span.brandTitle {
   font-size: 46px;
 }
 `
-const Header = observer(({title, subTitle, state}) => (
+const Header = ({title, subTitle}) => (
   <Fragment>
     <div className='top'>
-      <span className='brandTitle' >{`${title} - ${state.count}`}</span>
+      <span className='brandTitle' >{`${title}`}</span>
       <span>{subTitle}</span>
     </div>
     <style jsx>{headerCss}</style>
   </Fragment>
-))
+)
 
 const Content = ({contentChildren}) => (
   <Fragment>
@@ -48,24 +48,10 @@ const Content = ({contentChildren}) => (
   </Fragment>
 )
 
-class AppUIState {
-@observable count
-
-constructor () {
-  this.count = 0
-}
-
-@action inc () {
-  this.count++
-}
-}
-
 export default ({content}) => {
-  let appUIState = new AppUIState()
-
   return (
     <Fragment>
-      <Header state={appUIState} title='Avinty' subTitle='ZORGVERNIEUWERS NET ALS JIJ' />
+      <Header title='Avinty' subTitle='ZORGVERNIEUWERS NET ALS JIJ' />
       <Content contentChildren={content} />
     </Fragment>
   )

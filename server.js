@@ -33,15 +33,15 @@ app.prepare()
     dashboardData['4H7V9A2S'] = {
       title: 'Medewerker dashboard',
       navData: [
-        {label: 'caseload', module: true},
-        {label: 'agenda', module: true}
+        {label: 'Caseload', module: true, id: 'caseload', parameters: {m: 8463}},
+        {label: 'Agenda', module: true, id: 'agenda', parameters: {m: 8463}}
       ]
     }
     dashboardData['3JHD4GT5'] = {
       title: 'Client dashboard',
       navData: [
-        {label: 'agenda', module: true},
-        {label: 'personalia', module: true}
+        {label: 'Agenda', module: true, id: 'agenda', parameters: {c: 1234, m: 2353}},
+        {label: 'Personalia', module: true, id: 'personalia', parameters: {c: 1234, i: 5}}
       ]
     }
 
