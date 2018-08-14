@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react'
 import css from 'styled-jsx/css'
-import { observer } from 'mobx-react'
-import { observable, action } from 'mobx'
+import { Provider } from 'mobx-react'
+import appState from './app-model'
 
 let contentCss = css`
 div.content  {
@@ -50,9 +50,11 @@ const Content = ({contentChildren}) => (
 
 export default ({content}) => {
   return (
-    <Fragment>
-      <Header title='Avinty' subTitle='ZORGVERNIEUWERS NET ALS JIJ' />
-      <Content contentChildren={content} />
-    </Fragment>
+    <Provider appState={appState}>
+      <Fragment>
+        <Header title={appState.title} subTitle={appState.subTitle} />
+        <Content contentChildren={content} />
+      </Fragment>
+    </Provider>
   )
 }

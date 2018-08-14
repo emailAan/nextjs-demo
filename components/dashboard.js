@@ -53,10 +53,15 @@ export default class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.swithDashboard = this.swithDashboard.bind(this)
+    this.gotoDashboardHome = this.gotoDashboardHome.bind(this)
   }
 
   swithDashboard () {
-    Router.push('/open-dashboard', '/open-dashboard')
+    Router.push('/open-dashboard', '/')
+  }
+
+  gotoDashboardHome () {
+    this.props.openContent(null)
   }
 
   render () {
@@ -68,7 +73,7 @@ export default class Dashboard extends React.Component {
           stickyItems={(
             <Fragment>
               <NavLink entry={{label: 'Dashboard'}} action={this.swithDashboard} lvl={1} />
-              <NavLink entry={{label: 'Home'}} action={() => this.props.openContent(null)} lvl={1} />
+              <NavLink entry={{label: 'Home'}} action={() => this.gotoDashboardHome} lvl={1} />
               <br />
             </Fragment>
           )}

@@ -46,11 +46,7 @@ class CustomApp extends App {
   static async getInitialProps ({ Component, ctx }) {
     const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {}
 
-    // let response = await fetch('http://localhost:8081/api/navigation')
-    // let navData = await response.json()
-    let navData = []
-
-    return { pageProps, navData }
+    return { pageProps }
   }
 
   componentDidMount () {

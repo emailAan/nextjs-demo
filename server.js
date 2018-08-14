@@ -19,7 +19,7 @@ app.prepare()
 
     server.get('/d/:id/:module', (req, res) => {
       const actualPage = '/dashboard'
-      const queryParams = { id: req.params.id, module: req.params.module }
+      const queryParams = { ...req.query, id: req.params.id, module: req.params.module, parameters: req.query }
       app.render(req, res, actualPage, queryParams)
     })
 
