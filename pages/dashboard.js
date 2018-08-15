@@ -5,17 +5,14 @@ import * as mobx from 'mobx'
 
 import Dashboard from '../components/dashboard'
 import { DashboardModel } from '../components/dashboard-model'
-import appState from '../components/app-model'
-
-require('es6-promise').polyfill()
-require('isomorphic-fetch')
+import contentState from '../components/main-model'
 
 const isServer = typeof window === 'undefined'
 
 @inject('appState')
 class DashboardWrapper extends React.Component {
   static async getInitialProps ({query, req}) {
-    let dashboard = appState.getDashboardById(query.id)
+    let dashboard = contentState.getDashboardById(query.id)
 
     if (isServer || !dashboard) {
       let response = await this.getDashboardInfo(query.id)

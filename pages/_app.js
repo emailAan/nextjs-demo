@@ -1,41 +1,16 @@
 import React from 'react'
-import { createStore } from 'redux'
-import { Provider } from 'react-redux'
 import App, { Container } from 'next/app'
-import withRedux from 'next-redux-wrapper'
-
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import JssProvider from 'react-jss/lib/JssProvider'
-import AvintyApp from '../components/app'
+
+import Main from '../components/main'
 import getPageContext from '../components/getPageContext'
 
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
 
-const reducer = (state = { counter: 0 }, action) => {
-  switch (action.type) {
-    case 'INCREASE':
-      let { counter } = state
-      return { ...state, counter: counter + 1 }
-    default:
-      return state
-  }
-}
-
-/**
-* @param {object} initialState
-* @param {boolean} options.isServer indicates whether it is a server side or client side
-* @param {Request} options.req NodeJS Request object (not set when client applies initialState from server)
-* @param {Request} options.res NodeJS Request object (not set when client applies initialState from server)
-* @param {boolean} options.debug User-defined debug mode param
-* @param {string} options.storeKey This key will be used to preserve store in global namespace for safe HMR
-*/
-const makeStore = (initialState, options) => {
-  return createStore(reducer, initialState)
-}
-
-class CustomApp extends App {
+class AvintyApp extends App {
   constructor (props) {
     super(props)
     this.pageContext = getPageContext()
@@ -58,7 +33,7 @@ class CustomApp extends App {
   }
 
   render () {
-    const { Component, pageProps, store } = this.props
+    const { Component, pageProps } = this.props
     return (
       <Container>
         <JssProvider
@@ -68,10 +43,8 @@ class CustomApp extends App {
             theme={this.pageContext.theme}
             sheetsManager={this.pageContext.sheetsManager}>
             <CssBaseline />
-            <AvintyApp content={(
-              <Provider store={store}>
-                <Component pageContext={this.pageContext} {...pageProps} />
-              </Provider>
+            <Main content={(
+              <Component pageContext={this.pageContext} {...pageProps} />
             )} />
           </MuiThemeProvider>
         </JssProvider>
@@ -80,4 +53,4 @@ class CustomApp extends App {
   }
 }
 
-export default withRedux(makeStore)(CustomApp)
+export default AvintyApp

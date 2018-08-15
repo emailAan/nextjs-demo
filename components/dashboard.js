@@ -57,7 +57,7 @@ export default class Dashboard extends React.Component {
   }
 
   swithDashboard () {
-    Router.push('/open-dashboard', '/')
+    Router.push('/dashboard-selection', '/')
   }
 
   gotoDashboardHome () {

@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react'
 import css from 'styled-jsx/css'
 import { Provider } from 'mobx-react'
-import appState from './app-model'
+import contentState from './main-model'
 
 let contentCss = css`
 div.content  {
@@ -50,9 +50,9 @@ const Content = ({contentChildren}) => (
 
 export default ({content}) => {
   return (
-    <Provider appState={appState}>
+    <Provider appState={contentState}>
       <Fragment>
-        <Header title={appState.title} subTitle={appState.subTitle} />
+        <Header title={contentState.title} subTitle={contentState.subTitle} />
         <Content contentChildren={content} />
       </Fragment>
     </Provider>

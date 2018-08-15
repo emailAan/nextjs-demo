@@ -1,6 +1,6 @@
 import {computed, action, observable} from 'mobx'
 
-export class AppModel {
+export class MainModel {
   @observable loadedDashboards = {}
   @observable currentDashboardId
   @observable title = 'Avinty'
@@ -24,6 +24,6 @@ export class AppModel {
   }
 }
 
-const appState = new AppModel()
+const mainState = new MainModel()
 
-export default appState
+export default mainState
