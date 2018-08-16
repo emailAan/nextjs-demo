@@ -2,46 +2,54 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 class Counter extends React.Component {
-    increment = () => {
-      this.props.dispatch({ type: 'INCREMENT' })
-    };
+  constructor () {
+    super()
+    this.increment = this.increment.bind(this)
+    this.decrement = this.decrement.bind(this)
+    this.globalIncrement = this.globalIncrement.bind(this)
+    this.globalDecrement = this.globalDecrement.bind(this)
+  }
 
-    decrement = () => {
-      this.props.dispatch({ type: 'DECREMENT' })
-    };
+  increment () {
+    this.props.dispatch({ type: 'INCREMENT' })
+  };
 
-    globalIncrement = () => {
-      this.props.globalEventDistributor.dispatch({ type: 'INCREMENT' })
-    };
+  decrement () {
+    this.props.dispatch({ type: 'DECREMENT' })
+  };
 
-    globalDecrement = () => {
-      this.props.globalEventDistributor.dispatch({ type: 'DECREMENT' })
-    };
+  globalIncrement () {
+    this.props.globalEventDistributor.dispatch({ type: 'INCREMENT' })
+  };
 
-    render () {
-      return (
+  globalDecrement () {
+    this.props.globalEventDistributor.dispatch({ type: 'DECREMENT' })
+  };
+
+  render () {
+    return (
+      <div>
+        <br />
         <div>
-          <br />
-          <div>
-            <b> Count: {this.props.count}</b><br /><br />
-            <button onClick={this.increment}>local increment</button>
+          <b> Count: {this.props.count}</b><br /><br />
+          <button onClick={this.increment}>local increment</button>
                     &nbsp;Send a <b>local</b> increment event. This will only increase the counter for the current app. <br />
 
-            <button onClick={this.decrement}>local decrement</button>
+          <button onClick={this.decrement}>local decrement</button>
                     &nbsp;Send a <b>local</b> decrement event. This will only decrement the counter for the current app. <br />
 
-            <button onClick={this.globalIncrement}>global increment</button>
+          <button onClick={this.globalIncrement}>global increment</button>
                     &nbsp;Send a <b>global</b> increment event. This will increase the counter for the current app and all
                     other apps that listen to this event. <br />
 
-            <button onClick={this.globalDecrement}>global decrement</button>
+          <button onClick={this.globalDecrement}>global decrement</button>
                     &nbsp;Send a <b>global</b> decrement event. This will increase the counter for the current app and all
                     other apps that listen to this event. <br />
-          </div>
-
         </div>
-      )
-    }
+
+      </div>
+    )
+  }
 }
 
 function mapStateToProps (state) {

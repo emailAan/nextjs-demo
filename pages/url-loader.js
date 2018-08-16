@@ -1,24 +1,11 @@
-import css from 'styled-jsx/css'
 import {withRouter} from 'next/router'
+import Typography from '@material-ui/core/Typography'
 
-let iframe = css`
-iframe {
-  border: 0;
-  min-width: calc(100% - 10px);
-  min-height: calc(100% - 50px);
-  bottom: 0px;
-  position: absolute;
-  overflow-x: hidden;
-  overflow-y: hidden;
-}
-`
+import Iframe from '../components/iframe'
 
-export default withRouter(
-  (props) => (
-    <div>
-      <h1>{props.router.query.url}</h1>
-      <iframe src={props.router.query.url} />
-      <style jsx>{iframe}</style>
-    </div>
-  )
-)
+export default withRouter((props) => (
+  <div>
+    <Typography variant='headline' gutterBottom>{props.router.query.url}</Typography>
+    <Iframe url={props.router.query.url} maxWidth maxHeight />
+  </div>
+))

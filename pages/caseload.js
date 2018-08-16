@@ -5,9 +5,6 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Typography from '@material-ui/core/Typography'
 
-require('es6-promise').polyfill()
-require('isomorphic-fetch')
-
 let CaseloadListItem = ({label, id}) => (
   <ListItem divider button onClick={() => Router.push(`/personalia?id=${id}`, `/personalia/${id}`)}><ListItemText>{label}</ListItemText></ListItem>
 )
