@@ -5,7 +5,7 @@ export class DashboardModel {
     @observable title = 'Dashboard'
     @observable module = ''
     @observable parameters = {}
-    @observable navData = []
+    @observable.shallow navData = []
     // navData = []
 
     constructor (data) {
