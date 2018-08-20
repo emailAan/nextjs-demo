@@ -5,7 +5,7 @@ const proxy = require('http-proxy-middleware')
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
-const port = 3000
+const port = 80
 
 app.prepare()
   .then(() => {
@@ -33,15 +33,16 @@ app.prepare()
     dashboardData['4H7V9A2S'] = {
       title: 'Medewerker dashboard',
       navData: [
-        {label: 'Caseload', module: true, id: 'caseload', parameters: {m: 8463}},
-        {label: 'Agenda', module: true, id: 'agenda', parameters: {m: 8463}}
+        {label: 'Caseload', module: true, type: 'react', id: 'caseload', parameters: {m: 8463}},
+        {label: 'Agenda', module: true, type: 'react', id: 'agenda', parameters: {m: 8463}}
       ]
     }
     dashboardData['3JHD4GT5'] = {
       title: 'Client dashboard',
       navData: [
-        {label: 'Agenda', module: true, id: 'agenda', parameters: {c: 1234, m: 2353}},
-        {label: 'Personalia', module: true, id: 'personalia', parameters: {c: 1234, i: 5}}
+        {label: 'Agenda', module: true, type: 'react', id: 'agenda', parameters: {c: 1234, m: 2353}},
+        {label: 'Personalia', module: true, type: 'adf', id: '60', parameters: {c: 1234, i: 5}},
+        {label: 'Zorgplandoelen', module: true, type: 'adf', id: '21', parameters: {c: 1234, i: 5}}
       ]
     }
 

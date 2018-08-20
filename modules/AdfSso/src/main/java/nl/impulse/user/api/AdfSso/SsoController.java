@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 public class SsoController {
@@ -21,6 +22,7 @@ public class SsoController {
 	private SsoService ssoService;
 
 	@Transactional
+	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/sso")
 	public String getSsoUrl(@RequestParam(value = "client", required = true) Long client,
 			@RequestParam(value = "volgnummer", required = true) Long volgnummer,

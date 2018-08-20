@@ -4,6 +4,7 @@ import { inject, observer } from 'mobx-react'
 import Router from 'next/router'
 
 import Navbar, {NavLink} from './Navbar'
+import ModuleLoader from '../components/module-loader'
 
 let headerCss = css`
 div.top {
@@ -41,7 +42,7 @@ const Container = ({children}) => <div>{children}</div>
 
 const Title = ({value}) => <span style={{fontSize: '26px'}} >{value}</span>
 
-const Module = ({module, title}) => <span>{`module:${module}, dash:${title}`}</span>
+const Module = ({module, title, customProps, type}) => <ModuleLoader type={type} customProps={customProps} title={module} location={`/modules/${module}/component.js`} />
 
 const Dash = ({info}) => <span>{info}</span>
 
@@ -65,7 +66,7 @@ export default class Dashboard extends React.Component {
   }
 
   render () {
-    const { module: m, title, info } = this.props.dashboard
+    const { module: m, title, info, parameters, type } = this.props.dashboard
 
     return (
       <Fragment>
@@ -86,7 +87,7 @@ export default class Dashboard extends React.Component {
             <Title value={title} />
           )} />
         <Container>
-          {m ? <Module module={m} title={title} /> : <Dash info={info} />}
+          {m ? <Module type={type} customProps={parameters} module={m} title={title} /> : <Dash info={info} />}
         </Container>
       </Fragment>
     )

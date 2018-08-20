@@ -2,7 +2,7 @@ const path = require('path')
 
 module.exports = {
   entry: {
-    agenda: './src/root.component.js',
+    component: './src/root.component.js',
     singleSpaEntry: './src/singleSpaEntry.js',
     store: './src/store.js'
   },

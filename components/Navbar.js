@@ -114,7 +114,7 @@ class Navbar extends React.Component {
 
   navigationAction (item) {
     if (item.module) {
-      this.props.openContent(item.id, item.parameters)
+      this.props.openContent(item.id, item.parameters, item.type)
     } else {
       window.location = '#'
     }

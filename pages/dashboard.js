@@ -17,12 +17,14 @@ class DashboardWrapper extends React.Component {
     if (isServer || !dashboard) {
       let response = await this.getDashboardInfo(query.id)
       let dashboardInfo = await response.json()
+      console.log(dashboardInfo)
 
       dashboard = new DashboardModel({
         navData: dashboardInfo.navData,
         title: dashboardInfo.title,
         id: query.id,
         module: query.module,
+        type: dashboardInfo.type,
         parameters: query.parameters
       })
     }
@@ -31,7 +33,7 @@ class DashboardWrapper extends React.Component {
   }
 
   static getDashboardInfo (id) {
-    return fetch(`http://localhost:3000/api/dashboard/${id}`)
+    return fetch(`http://localhost/api/dashboard/${id}`)
   }
 
   initDashboardModel () {
@@ -47,8 +49,9 @@ class DashboardWrapper extends React.Component {
     }
   }
 
-  updateDashboardModel ({ module: newModule, parameters: newParameters }) {
+  updateDashboardModel ({ module: newModule, parameters: newParameters, type }) {
     this.dashboardModel.module = newModule
+    this.dashboardModel.type = type
     this.dashboardModel.parameters = JSON.parse(newParameters)
   }
 
@@ -58,13 +61,13 @@ class DashboardWrapper extends React.Component {
       .join('&')
   }
 
-  openContent (module, parameters) {
+  openContent (module, parameters, type) {
     const urlQuery = this.parametersToUrlQuery(parameters)
     const {id} = this.dashboardModel
 
     Router.push({
       pathname: '/dashboard',
-      query: { id, module, parameters: JSON.stringify(parameters) }
+      query: { id, module, parameters: JSON.stringify(parameters), type }
     },
     `/d/${id}/${module || ''}${urlQuery ? `?${urlQuery}` : ''}`,
     {shallow: true})

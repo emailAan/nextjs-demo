@@ -4,6 +4,7 @@ export class DashboardModel {
     @observable id = ''
     @observable title = 'Dashboard'
     @observable module = ''
+    @observable moduleType = ''
     @observable parameters = {}
     @observable navData = []
     // navData = []
@@ -12,12 +13,14 @@ export class DashboardModel {
       this.setState(data)
     }
 
-    @action setState ({id, title, module, parameters, navData}) {
+    @action setState ({id, title, module, parameters, navData, type}) {
       this.id = id
       this.title = title
       this.navData = navData
       this.module = module
       this.parameters = parameters
+      this.type = type
+      console.log(this.type)
     }
 
     @computed get info () {
