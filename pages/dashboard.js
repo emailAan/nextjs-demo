@@ -1,97 +1,97 @@
 import React from 'react'
 import Router, {withRouter} from 'next/router'
-import { Provider, inject } from 'mobx-react'
-import * as mobx from 'mobx'
+import { connect } from 'react-redux'
 
-import Dashboard from '../components/dashboard'
-import { DashboardModel } from '../components/dashboard-model'
-import contentState from '../components/main-model'
+import Dashboard from '../containers/dashboard/dashboard'
+import {initDashboard, setModule} from '../containers/dashboard/actions'
+import {newDashboard} from '../containers/main/actions'
+import {stringifyParameters, parametersToUrlQuery, convertParameters} from '../utils'
+import {getDashboardById} from '../containers/main/selectors'
 
 const isServer = typeof window === 'undefined'
 
-@inject('appState')
 class DashboardWrapper extends React.Component {
-  static async getInitialProps ({query, req}) {
-    let dashboard = contentState.getDashboardById(query.id)
-
+  static async getInitialProps ({reduxStore, query, req}) {
+    let dashboard = getDashboardById(reduxStore.getState(), query.id)
+    console.log(query.id, dashboard)
     if (isServer || !dashboard) {
       let response = await this.getDashboardInfo(query.id)
       let dashboardInfo = await response.json()
-      console.log(dashboardInfo)
-
-      dashboard = new DashboardModel({
+      let dashboard = {
         navData: dashboardInfo.navData,
         title: dashboardInfo.title,
         id: query.id,
         module: query.module,
-        type: dashboardInfo.type,
-        parameters: query.parameters
-      })
+        parameters: convertParameters(query.parameters)
+      }
+
+      reduxStore.dispatch(newDashboard(dashboard))
     }
 
-    return { dashboardData: mobx.toJS(dashboard) }
+    reduxStore.dispatch(initDashboard(dashboard))
+
+    return { }
   }
 
   static getDashboardInfo (id) {
     return fetch(`http://localhost/api/dashboard/${id}`)
   }
 
-  initDashboardModel () {
-    let {dashboardData, id, appState} = this.props
-    this.dashboardModel = appState.getDashboardById(id)
+  async updateDashboard (newModule, parameters) {
+    if (!newModule) {
+      this.props.setModule()
+    } else if (this.props.dashboard.module !== newModule) {
+      const res = await fetch(`http://localhost/api/modules/${newModule}`)
+      const moduleMetaData = await res.json()
 
-    if (!this.dashboardModel) {
-      this.dashboardModel = new DashboardModel(dashboardData)
-
-      appState.newDashboard(id, this.dashboardModel)
-    } else {
-      this.dashboardModel.setState(dashboardData)
+      this.props.setModule(newModule, moduleMetaData, parameters)
     }
   }
 
-  updateDashboardModel ({ module: newModule, parameters: newParameters, type }) {
-    this.dashboardModel.module = newModule
-    this.dashboardModel.type = type
-    this.dashboardModel.parameters = JSON.parse(newParameters)
-  }
+  openContent (module, parameters) {
+    if (!module) {
+      this.updateDashboard(null, null)
+    }
 
-  parametersToUrlQuery (p) {
-    return !p ? '' : Object.keys(p)
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(p[key])}`)
-      .join('&')
-  }
-
-  openContent (module, parameters, type) {
-    const urlQuery = this.parametersToUrlQuery(parameters)
-    const {id} = this.dashboardModel
+    const urlQuery = parametersToUrlQuery(parameters)
+    const {id} = this.props.dashboard
 
     Router.push({
       pathname: '/dashboard',
-      query: { id, module, parameters: JSON.stringify(parameters), type }
+      query: { id, module, parameters: stringifyParameters(parameters) }
     },
     `/d/${id}/${module || ''}${urlQuery ? `?${urlQuery}` : ''}`,
     {shallow: true})
+
+    this.updateDashboard(module, convertParameters(parameters))
   }
 
   constructor (props) {
     super(props)
 
     this.openContent = this.openContent.bind(this)
-
-    this.initDashboardModel()
-  }
-
-  componentWillReceiveProps (nextProps) {
-    this.updateDashboardModel(nextProps.router.query)
   }
 
   render () {
     return (
-      <Provider openContent={this.openContent} dashboard={this.dashboardModel}>
-        <Dashboard />
-      </Provider>
+      <Dashboard openContent={this.openContent} />
     )
   }
 }
 
-export default withRouter(DashboardWrapper)
+const mapStateToProps = state => {
+  return {
+    dashboard: state.dashboard
+  }
+}
+
+const mapDispatchToProps = {
+  setModule: (module, moduleMetaData, moduleParameters) => {
+    return setModule(module, moduleMetaData, moduleParameters)
+  }
+}
+
+export default withRouter(connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(DashboardWrapper))

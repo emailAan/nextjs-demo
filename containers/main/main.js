@@ -1,7 +1,6 @@
 import React, {Fragment} from 'react'
 import css from 'styled-jsx/css'
-import { Provider } from 'mobx-react'
-import contentState from './main-model'
+import { connect } from 'react-redux'
 
 let contentCss = css`
 div.content  {
@@ -39,7 +38,7 @@ const Header = ({title, subTitle}) => (
   </Fragment>
 )
 
-const Content = ({contentChildren}) => (
+const ContentWrapper = ({contentChildren}) => (
   <Fragment>
     <div className='content'>
       {contentChildren}
@@ -48,13 +47,20 @@ const Content = ({contentChildren}) => (
   </Fragment>
 )
 
-export default ({content}) => {
+const Main = ({content, title, subTitle}) => {
   return (
-    <Provider appState={contentState}>
-      <Fragment>
-        <Header title={contentState.title} subTitle={contentState.subTitle} />
-        <Content contentChildren={content} />
-      </Fragment>
-    </Provider>
+    <Fragment>
+      <Header title={title} subTitle={subTitle} />
+      <ContentWrapper contentChildren={content} />
+    </Fragment>
   )
 }
+
+const mapStateToProps = state => {
+  return {
+    title: state.main.title,
+    subTitle: state.main.subTitle
+  }
+}
+
+export default connect(mapStateToProps)(Main)

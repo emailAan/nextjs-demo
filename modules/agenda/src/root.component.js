@@ -8,7 +8,7 @@ export default class Root extends React.Component {
   render () {
     return (
       <div>
-        <span>Agenda van {this.props.c}</span>
+        <span>Agenda van {this.props.client}</span>
       </div>
     )
   }

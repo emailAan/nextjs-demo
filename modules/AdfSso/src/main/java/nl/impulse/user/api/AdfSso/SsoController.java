@@ -22,7 +22,7 @@ public class SsoController {
 	private SsoService ssoService;
 
 	@Transactional
-	@CrossOrigin
+	@CrossOrigin(origins = "http://localhost")
 	@RequestMapping(method = RequestMethod.GET, value = "/sso")
 	public String getSsoUrl(@RequestParam(value = "client", required = true) Long client,
 			@RequestParam(value = "volgnummer", required = true) Long volgnummer,

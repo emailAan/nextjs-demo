@@ -1,0 +1,2 @@
+export const SET_MODULE = 'SET_MODULE'
+export const INIT_DASHBOARD = 'INIT_DASHBOARD'

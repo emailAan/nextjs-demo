@@ -3,9 +3,11 @@ import App, { Container } from 'next/app'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import JssProvider from 'react-jss/lib/JssProvider'
+import { Provider } from 'react-redux'
 
-import Main from '../components/main'
-import getPageContext from '../components/getPageContext'
+import Main from '../containers/main'
+import getPageContext from '../utils/getPageContext'
+import withReduxStore from '../utils/with-redux-store'
 
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
@@ -33,24 +35,26 @@ class AvintyApp extends App {
   }
 
   render () {
-    const { Component, pageProps } = this.props
+    const { Component, pageProps, reduxStore } = this.props
     return (
       <Container>
-        <JssProvider
-          registry={this.pageContext.sheetsRegistry}
-          generateClassName={this.pageContext.generateClassName}>
-          <MuiThemeProvider
-            theme={this.pageContext.theme}
-            sheetsManager={this.pageContext.sheetsManager}>
-            <CssBaseline />
-            <Main content={(
-              <Component pageContext={this.pageContext} {...pageProps} />
-            )} />
-          </MuiThemeProvider>
-        </JssProvider>
+        <Provider store={reduxStore}>
+          <JssProvider
+            registry={this.pageContext.sheetsRegistry}
+            generateClassName={this.pageContext.generateClassName}>
+            <MuiThemeProvider
+              theme={this.pageContext.theme}
+              sheetsManager={this.pageContext.sheetsManager}>
+              <CssBaseline />
+              <Main content={(
+                <Component pageContext={this.pageContext} {...pageProps} />
+              )} />
+            </MuiThemeProvider>
+          </JssProvider>
+        </Provider>
       </Container>
     )
   }
 }
 
-export default AvintyApp
+export default withReduxStore(AvintyApp)
