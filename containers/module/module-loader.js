@@ -6,13 +6,15 @@ import ModuleReact from '../../components/module-react'
 import ModuleAdf from '../../components/module-adf'
 import ModuleUrl from '../../components/module-url'
 
+import {getModuleComponentUrl} from '../../utils/api'
+
 class ModuleLoader extends React.Component {
   renderModule () {
     let {type, module} = this.props
 
     if (type === 'react') {
       return <ModuleReact {...this.props} customProps={this.props.customProps}
-        location={`/modules/${this.props.module}/component.js`} />
+        location={getModuleComponentUrl(module)} />
     } else if (type === 'adf') {
       return <ModuleAdf {...this.props} customProps={this.props.customProps} />
     } else if (type === 'url') {

@@ -1,15 +1,12 @@
 import {Fragment} from 'react'
 import css from 'styled-jsx/css'
 
-const navLinkStyle = css`
+const navItemStyle = css`
 li:hover {
     background-color: #4b555f;
 }      
 li {
-    padding-top: 14px;
-    padding-bottom: -14px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 5px;
     height: 100%;
 }      
 li.second {
@@ -28,16 +25,16 @@ a {
 }      
 `
 
-const NavLink = ({entry, lvl, action, selected}) => (
+const NavItem = ({item, lvl, action, selected}) => (
   <Fragment>
     <a onClick={action}>
       <li style={selected ? {fontStyle: 'italic'} : {}} className={lvl > 1 ? 'second' : ''} >
-        <span>{entry.label}</span>
-        {entry.counter ? <span className='counter' >{entry.counter}</span> : null }
+        <span>{item.label}</span>
+        {item.counter ? <span className='counter' >{item.counter}</span> : null }
       </li>
     </a>
-    <style jsx>{navLinkStyle}</style>
+    <style jsx>{navItemStyle}</style>
   </Fragment>
 )
 
-export default NavLink
+export default NavItem

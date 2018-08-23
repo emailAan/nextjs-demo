@@ -1,10 +1,10 @@
 import React, {Fragment} from 'react'
-import Router from 'next/router'
 import { connect } from 'react-redux'
 
-import NavigationBar, {NavigationLink} from '../../components/navigation-bar'
+import NavigationBar, {NavigationItem} from '../../components/navigation-bar'
 import DashboardHeader from '../../components/dashboard-header'
 import ModuleLoader from '../module/module-loader'
+import {swithDashboard} from '../../utils/routes'
 
 const Container = ({children}) => <div>{children}</div>
 
@@ -15,12 +15,7 @@ const Brand = () => <img src='/brandImage.png' />
 class Dashboard extends React.Component {
   constructor (props) {
     super(props)
-    this.swithDashboard = this.swithDashboard.bind(this)
     this.gotoDashboardHome = this.gotoDashboardHome.bind(this)
-  }
-
-  swithDashboard () {
-    Router.push('/dashboard-selection', '/')
   }
 
   gotoDashboardHome () {
@@ -49,9 +44,8 @@ class Dashboard extends React.Component {
           openContent={this.props.openContent}
           stickyItems={(
             <Fragment>
-              <NavigationLink entry={{label: 'Dashboard'}} action={this.swithDashboard} lvl={1} />
-              <NavigationLink entry={{label: 'Home'}} action={this.gotoDashboardHome} lvl={1} />
-              <br />
+              <NavigationItem item={{label: 'Dashboard'}} action={swithDashboard} lvl={1} />
+              <NavigationItem item={{label: 'Home'}} action={this.gotoDashboardHome} lvl={1} />
             </Fragment>
           )}
         />
@@ -76,17 +70,6 @@ const mapStateToProps = state => {
     subTitle: state.main.subTitle
   }
 }
-
-const mapDispatchToProps = dispatch => {
-  return {
-    destroyTodo: () =>
-      dispatch({
-        type: 'DESTROY_TODO'
-      })
-  }
-}
-
 export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+  mapStateToProps
 )(Dashboard)

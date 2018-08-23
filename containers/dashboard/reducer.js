@@ -6,7 +6,6 @@ const initialState = {
   module: '',
   moduleParameters: {},
   moduleMetaData: {},
-  parameters: {},
   navData: []
 }
 
@@ -17,7 +16,7 @@ const reducer = (state = initialState, action) => {
       return { ...state, module, moduleMetaData, moduleParameters }
     }
     case constants.INIT_DASHBOARD: {
-      return { ...state, ...action.dashboard, module: null, moduleMetaData: null, moduleParameters: null }
+      return { ...state, ...action.dashboard }
     }
     default:
       return state

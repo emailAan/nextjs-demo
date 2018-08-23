@@ -12,7 +12,6 @@ class MyDocument extends Document {
       <html lang='en' dir='ltr'>
         <Head>
           <title>Avinty: Zorgvernieuwers net als jij</title>
-          <script src='/static/system.js' />
           <meta charSet='utf-8' />
           {/* Use minimum-scale=1 to enable GPU rasterization */}
           <meta name='viewport' content={'user-scalable=0, initial-scale=1, minimum-scale=1, width=device-width, height=device-height'} />
@@ -20,6 +19,8 @@ class MyDocument extends Document {
           <meta name='theme-color' content={pageContext.theme.palette.primary.main} />
           {/* */}
           <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500' />
+          <script src='/static/es6-promise.auto.min.js' />
+          <script src='/static/system.js' />
         </Head>
         <body>
           <Main />

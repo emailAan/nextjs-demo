@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import Iframe from './iframe'
 import {parametersToCustomStringFormat} from '../utils'
+import {getModuleBaseUrl} from '../utils/api'
 
 class ModuleAdf extends React.Component {
   constructor (props) {
@@ -22,7 +23,7 @@ class ModuleAdf extends React.Component {
     const {client, inschrijving} = props.customProps
     let paramsString = parametersToCustomStringFormat(props.customProps)
 
-    const response = await fetch(`http://localhost:3000/sso?client=${client}&volgnummer=${inschrijving}&params=${paramsString}&module=${props.id}`)
+    const response = await fetch(`${getModuleBaseUrl('sso')}/sso?client=${client}&volgnummer=${inschrijving}&params=${paramsString}&module=${props.id}`)
     const url = await response.text()
     this.setState({...this.state, url})
   }

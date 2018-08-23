@@ -1,47 +1,61 @@
 import React from 'react'
-import Router, {withRouter} from 'next/router'
+import {withRouter} from 'next/router'
 import { connect } from 'react-redux'
 
 import Dashboard from '../containers/dashboard/dashboard'
 import {initDashboard, setModule} from '../containers/dashboard/actions'
 import {newDashboard} from '../containers/main/actions'
-import {stringifyParameters, parametersToUrlQuery, convertParameters} from '../utils'
 import {getDashboardById} from '../containers/main/selectors'
 
-const isServer = typeof window === 'undefined'
+import {convertParameters, isServer} from '../utils'
+import {getModuleApiUrl, apiBaseUrl} from '../utils/api'
+import {openModule} from '../utils/routes'
 
 class DashboardWrapper extends React.Component {
-  static async getInitialProps ({reduxStore, query, req}) {
-    let dashboard = getDashboardById(reduxStore.getState(), query.id)
-    console.log(query.id, dashboard)
+  static async getInitialProps ({store, query, req}) {
+    let dashboard = getDashboardById(store.getState(), query.id)
+
     if (isServer || !dashboard) {
       let response = await this.getDashboardInfo(query.id)
       let dashboardInfo = await response.json()
-      let dashboard = {
+      dashboard = {
         navData: dashboardInfo.navData,
         title: dashboardInfo.title,
         id: query.id,
         module: query.module,
-        parameters: convertParameters(query.parameters)
+        moduleParameters: convertParameters(query)
       }
 
-      reduxStore.dispatch(newDashboard(dashboard))
+      store.dispatch(newDashboard(dashboard))
     }
 
-    reduxStore.dispatch(initDashboard(dashboard))
+    if (dashboard.module) {
+      const res = await fetch(getModuleApiUrl(dashboard.module))
+      const moduleMetaData = await res.json()
+
+      dashboard = {...dashboard,
+        moduleMetaData}
+    } else {
+      dashboard = {...dashboard,
+        module: null,
+        moduleMetaData: null,
+        moduleParameters: null}
+    }
+
+    store.dispatch(initDashboard(dashboard))
 
     return { }
   }
 
   static getDashboardInfo (id) {
-    return fetch(`http://localhost/api/dashboard/${id}`)
+    return fetch(`${apiBaseUrl}/dashboard/${id}`)
   }
 
   async updateDashboard (newModule, parameters) {
     if (!newModule) {
       this.props.setModule()
     } else if (this.props.dashboard.module !== newModule) {
-      const res = await fetch(`http://localhost/api/modules/${newModule}`)
+      const res = await fetch(getModuleApiUrl(newModule))
       const moduleMetaData = await res.json()
 
       this.props.setModule(newModule, moduleMetaData, parameters)
@@ -49,40 +63,26 @@ class DashboardWrapper extends React.Component {
   }
 
   openContent (module, parameters) {
-    if (!module) {
-      this.updateDashboard(null, null)
-    }
-
-    const urlQuery = parametersToUrlQuery(parameters)
     const {id} = this.props.dashboard
 
-    Router.push({
-      pathname: '/dashboard',
-      query: { id, module, parameters: stringifyParameters(parameters) }
-    },
-    `/d/${id}/${module || ''}${urlQuery ? `?${urlQuery}` : ''}`,
-    {shallow: true})
-
-    this.updateDashboard(module, convertParameters(parameters))
+    // update location
+    openModule(id, module, parameters)
+    // update store
+    this.updateDashboard(module, parameters ? convertParameters(parameters) : null)
   }
 
   constructor (props) {
     super(props)
-
     this.openContent = this.openContent.bind(this)
   }
 
   render () {
-    return (
-      <Dashboard openContent={this.openContent} />
-    )
+    return <Dashboard openContent={this.openContent} />
   }
 }
 
 const mapStateToProps = state => {
-  return {
-    dashboard: state.dashboard
-  }
+  return { dashboard: state.dashboard }
 }
 
 const mapDispatchToProps = {
