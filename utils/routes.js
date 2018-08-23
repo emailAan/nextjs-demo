@@ -1,5 +1,5 @@
 
-const {parametersToUrlQuery} = require('./parameters')
+const {minifyParameters} = require('./parameters')
 const routes = module.exports = require('next-routes')()
 
 routes.swithDashboard = () => {
@@ -7,10 +7,8 @@ routes.swithDashboard = () => {
 }
 
 routes.openModule = (id, module, parameters) => {
-  const urlQuery = parametersToUrlQuery(parameters)
-
   if (module) {
-    routes.Router.pushRoute(`/d/${id}/${module}${urlQuery ? `?${urlQuery}` : ''}`, {shallow: true})
+    routes.Router.pushRoute('module', {id, module, ...minifyParameters(parameters)}, {shallow: true})
   } else {
     routes.Router.pushRoute('dashboard', {id}, {shallow: true})
   }
