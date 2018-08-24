@@ -35,22 +35,40 @@ const letterValue = (str) => {
 
 const MODULE_PREFIX = 'modules'
 
-var modules = proxy(`/${MODULE_PREFIX}`, {
+const modules = proxy(`/${MODULE_PREFIX}`, {
   target: `http://${MODULE_PREFIX}:3000/`,
   pathRewrite:
     function (path, req) {
       var moduleHost = req.originalUrl.split('/')[2]
-      // console.log(path.replace(`/${MODULE_PREFIX}/${moduleHost}`, ''))
+      console.log(path.replace(`/${MODULE_PREFIX}/${moduleHost}`, ''))
       return path.replace(`/${MODULE_PREFIX}/${moduleHost}`, '')
     },
   router:
     function (req) {
       const MODULE = req.originalUrl.split('/')[2]
       const MODULE_PORT = 65535 - letterValue(MODULE)
-      // console.log(`http://localhost:${MODULE_PORT}`)
+      console.log(`http://localhost:${MODULE_PORT}`)
       return `http://localhost:${MODULE_PORT}`
     },
   changeOrigin: true
 })
 
-module.exports = modules
+const moduleApis = proxy(`/api/${MODULE_PREFIX}`, {
+  target: `http://${MODULE_PREFIX}:3000/`,
+  pathRewrite:
+    function (path, req) {
+      var moduleHost = req.originalUrl.split('/')[3]
+      console.log(path.replace(`/${MODULE_PREFIX}/${moduleHost}`, ''))
+      return path.replace(`/${MODULE_PREFIX}/${moduleHost}`, '')
+    },
+  router:
+    function (req) {
+      const MODULE = req.originalUrl.split('/')[3]
+      const MODULE_PORT = 65535 - letterValue(MODULE)
+      console.log(`http://localhost:${MODULE_PORT}`)
+      return `http://localhost:${MODULE_PORT}`
+    },
+  changeOrigin: true
+})
+
+module.exports = {modules, moduleApis}

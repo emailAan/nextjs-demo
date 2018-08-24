@@ -1,82 +1,24 @@
 const express = require('express')
 const next = require('next')
 
-const modulesProxy = require('./modules-proxy')
-
+const { modules, moduleApis } = require('./modules-proxy')
 const routes = require('../utils/routes')
+const setDashboardApi = require('./dashboard-api')
+const { SERVER_PORT } = require('../utils')
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = routes.getRequestHandler(app)
-// const handle = app.getRequestHandler()
-const port = 80
-
-const dashboardData = {}
-dashboardData['4H7V9A2S'] = {
-  title: 'Medewerker dashboard',
-  navData: [
-    {label: 'Caseload', id: 'caseload', parameters: {m: 8463}},
-    {label: 'Agenda', id: 'agenda', parameters: {m: 8463}}
-  ]
-}
-dashboardData['3JHD4GT5'] = {
-  title: 'Client dashboard',
-  navData: [
-    {label: 'Agenda', id: 'agenda', parameters: {c: 1234, m: 2353}},
-    {label: 'Personalia', id: 'personalia', parameters: {c: 1234, i: 5}},
-    {label: 'Zorgplandoelen', id: 'zorgplandoelen', parameters: {c: 1234, i: 5}}
-  ]
-}
-
-const modulesMetaData = {
-  agenda: {
-    label: 'Agenda',
-    id: 'agenda',
-    type: 'react'
-  },
-  personalia: {
-    label: 'Personalia',
-    id: 60,
-    type: 'adf'
-  },
-  zorgplandoelen: {
-    label: 'Zorgplandoelen',
-    id: 21,
-    type: 'adf'
-  },
-  caseload: {
-    label: 'Caseload',
-    id: 'caseload',
-    type: 'react'
-  }
-}
+const port = SERVER_PORT
 
 app.prepare()
   .then(() => {
     const server = express()
 
-    // server.get('/d/:id/:module', (req, res) => {
-    //   const actualPage = '/dashboard'
-    //   const queryParams = { ...req.query, id: req.params.id, module: req.params.module, parameters: req.query }
-    //   app.render(req, res, actualPage, queryParams)
-    // })
+    setDashboardApi(server)
 
-    // server.get('/d/:id', (req, res) => {
-    //   const actualPage = '/dashboard'
-    //   const queryParams = { id: req.params.id }
-    //   app.render(req, res, actualPage, queryParams)
-    // })
-
-    server.get('/api/dashboard/:variables', (req, res) => {
-      res.status(200).send(dashboardData[req.params.variables])
-    })
-
-    server.get('/api/modules/:module', (req, res) => {
-      const module = modulesMetaData[req.params.module]
-      res.status(module ? 200 : 204).send(module || {})
-    })
-
-    server.use(modulesProxy)
+    server.use(modules)
+    server.use(moduleApis)
 
     // Let the rest handle by Next.js
     server.get('*', (req, res) => {

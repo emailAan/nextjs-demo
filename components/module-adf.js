@@ -24,7 +24,9 @@ class ModuleAdf extends React.Component {
     let paramsString = parametersToCustomStringFormat(props.customProps)
 
     const response = await fetch(`${getModuleBaseUrl('sso')}/sso?client=${client}&volgnummer=${inschrijving}&params=${paramsString}&module=${props.id}`)
-    const url = await response.text()
+
+    let url = (response.status === 200) ? await response.text() : ''
+
     this.setState({...this.state, url})
   }
 

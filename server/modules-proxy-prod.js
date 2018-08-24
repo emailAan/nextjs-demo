@@ -11,10 +11,24 @@ var modules = proxy(`/${MODULE_PREFIX}`, {
   },
   router: function (req) {
     const MODULE = req.originalUrl.split('/')[2]
-    console.log(`http://localhost:${MODULE_PORT}`)
     return `http://${MODULE}:${MODULE_PORT}`
   },
   changeOrigin: true
 })
 
-module.exports = modules
+const moduleApis = proxy(`/api/${MODULE_PREFIX}`, {
+  target: `http://${MODULE_PREFIX}:${MODULE_PORT}/`,
+  pathRewrite:
+    function (path, req) {
+      var moduleHost = req.originalUrl.split('/')[3]
+      return path.replace(`/${MODULE_PREFIX}/${moduleHost}`, '')
+    },
+  router:
+    function (req) {
+      const MODULE = req.originalUrl.split('/')[3]
+      return `http://${MODULE}:${MODULE_PORT}`
+    },
+  changeOrigin: true
+})
+
+module.exports = {modules, moduleApis}

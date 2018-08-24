@@ -1,6 +1,7 @@
 import {isServer} from './is-server'
+import {SERVER_PORT} from '.'
 
-export const baseUrl = isServer ? 'http://localhost' : ''
+export const baseUrl = isServer ? `http://localhost:${SERVER_PORT}` : ''
 export const apiBaseUrl = `${baseUrl}/api`
 export const moduleBaseUrl = `${baseUrl}/modules`
 export const moduleApiBaseUrl = `${apiBaseUrl}/modules`

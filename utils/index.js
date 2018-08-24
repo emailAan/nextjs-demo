@@ -1,2 +1,7 @@
-export * from './parameters'
-export * from './is-server'
+const SERVER_PORT = 8080
+
+module.exports = {
+    ...require('./parameters'),
+    ...require('./is-server'),
+    SERVER_PORT
+}

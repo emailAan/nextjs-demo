@@ -50,8 +50,9 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get('/api', (req, res) => res.status(200).send({
-  name: MODULE,
+  id: MODULE,
   label: 'Agenda',
+  type: 'react',
   counter: `/api/${MODULE}/counter`,
   stateless: false
 }))

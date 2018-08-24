@@ -24,6 +24,7 @@ class Dashboard extends React.Component {
 
   getContainerContent () {
     const { module: m, title, moduleParameters, moduleMetaData } = this.props.dashboard
+
     return m
       ? <ModuleLoader
         type={moduleMetaData.type}
