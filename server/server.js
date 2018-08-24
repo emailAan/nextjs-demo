@@ -2,6 +2,7 @@ const express = require('express')
 const next = require('next')
 
 const { modules, moduleApis } = require('./modules-proxy')
+const AuthController = require('./auth-controller')
 const routes = require('../utils/routes')
 const setDashboardApi = require('./dashboard-api')
 const { SERVER_PORT } = require('../utils')
@@ -17,6 +18,7 @@ app.prepare()
 
     setDashboardApi(server)
 
+    server.use('/api/auth', AuthController)
     server.use(modules)
     server.use(moduleApis)
 

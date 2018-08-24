@@ -1,4 +1,5 @@
 const dashboardData = {}
+
 dashboardData['4H7V9A2S'] = {
   title: 'Medewerker dashboard',
   navData: [
