@@ -6,6 +6,7 @@ const AuthController = require('./auth-controller')
 const routes = require('../utils/routes')
 const setDashboardApi = require('./dashboard-api')
 const { SERVER_PORT } = require('../utils')
+const VerifyToken = require('./verify-token')
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -21,6 +22,11 @@ app.prepare()
     server.use('/api/auth', AuthController)
     server.use(modules)
     server.use(moduleApis)
+
+    // Let the rest handle by Next.js
+    server.get('/login', (req, res) => {
+      return handle(req, res)
+    })
 
     // Let the rest handle by Next.js
     server.get('*', (req, res) => {

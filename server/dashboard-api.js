@@ -1,3 +1,5 @@
+const VerifyToken = require('./verify-token')
+
 const dashboardData = {}
 
 dashboardData['4H7V9A2S'] = {
@@ -17,12 +19,12 @@ dashboardData['3JHD4GT5'] = {
 }
 
 module.exports = (server) => {
-  server.get('/api/dashboard/:id', (req, res) => {
+  server.get('/api/dashboard/:id', VerifyToken, (req, res) => {
     let dashboard = dashboardData[req.params.id]
     res.status(dashboard ? 200 : 204).send(dashboard)
   })
 
-  server.get('/api/modules/:module', (req, res, next) => {
+  server.get('/api/modules/:module', VerifyToken, (req, res, next) => {
     const {module} = req.params
 
     if (module.startsWith('adf-')) {

@@ -79,6 +79,7 @@ router.get('/me', VerifyToken, async (req, res) => {
 })
 
 router.post('/login', async (req, res) => {
+  console.log(req.body)
   const user = await findUserByUsername(req.body.username)
 
   if (!user) return res.status(404).send('No user found.')
