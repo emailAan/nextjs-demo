@@ -16,7 +16,7 @@ var modules = proxy(`/${MODULE_PREFIX}`, {
   changeOrigin: true
 })
 
-const moduleApis = proxy(`/api/${MODULE_PREFIX}`, {
+const moduleApis = proxy(`/${MODULE_PREFIX}`, {
   target: `http://${MODULE_PREFIX}:${MODULE_PORT}/`,
   pathRewrite:
     function (path, req) {

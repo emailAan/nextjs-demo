@@ -5,10 +5,12 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import JssProvider from 'react-jss/lib/JssProvider'
 import { Provider } from 'react-redux'
 
-import Main from '../containers/main'
 import getPageContext from '../utils/getPageContext'
+import {LOGIN_URL} from '../utils/routes'
 import withRedux from 'next-redux-wrapper'
 import {initializeStore} from '../stores/store'
+import { redirectIfNotAuthenticated, redirectIfAuthenticated, verifyJwt } from '../utils/auth'
+import { SET_AUTHENTICATED } from '../containers/main/constants'
 
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
@@ -33,7 +35,24 @@ class AvintyApp extends App {
 
   pageContext = null;
 
-  static async getInitialProps ({ Component, ctx }) {
+  static async getInitialProps ({ Component, ctx, url, store, router }) {
+    console.log('router', router.asPath)
+    if (ctx.pathname !== LOGIN_URL && redirectIfNotAuthenticated(ctx, router.asPath)) {
+      return {}
+    }
+    if (ctx.pathname === LOGIN_URL && redirectIfAuthenticated(ctx)) {
+      return {}
+    }
+
+    // check on the server if the jwt token is valid and set state in redux
+    if (ctx.pathname !== LOGIN_URL) {
+      const res = await verifyJwt(ctx)
+      const authenticated = !!res.id
+
+      const payload = { authenticated, authData: res }
+      ctx.store.dispatch({type: SET_AUTHENTICATED, payload})
+    }
+
     const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {}
     return { pageProps }
   }
@@ -50,7 +69,8 @@ class AvintyApp extends App {
     const { Component, pageProps, store } = this.props
     return (
       <Container>
-        <Provider store={store}>
+        <Provider
+          store={store}>
           <JssProvider
             registry={this.pageContext.sheetsRegistry}
             generateClassName={this.pageContext.generateClassName}>
@@ -58,9 +78,9 @@ class AvintyApp extends App {
               theme={this.pageContext.theme}
               sheetsManager={this.pageContext.sheetsManager}>
               <CssBaseline />
-              <Main content={(
-                <Component pageContext={this.pageContext} {...pageProps} />
-              )} />
+              <Component
+                pageContext={this.pageContext}
+                {...pageProps} />
             </MuiThemeProvider>
           </JssProvider>
         </Provider>

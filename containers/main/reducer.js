@@ -10,7 +10,9 @@ const initialState = {
   loadedDashboards: {},
   currentDashboardId: null,
   title: 'Avinty',
-  subTitle: 'ZORGVERNIEUWERS NET ALS JIJ'
+  subTitle: 'ZORGVERNIEUWERS NET ALS JIJ',
+  authenticated: false,
+  authData: {}
 }
 
 const reducer = (state = initialState, action) => {
@@ -21,7 +23,18 @@ const reducer = (state = initialState, action) => {
       const newLoadedDashboards = { ...loadedDashboards }
       newLoadedDashboards[dashboard.id] = dashboard
 
-      return { ...state, loadedDashboards: newLoadedDashboards, currentDashboardId: dashboard.id }
+      return {
+        ...state,
+        loadedDashboards: newLoadedDashboards,
+        currentDashboardId: dashboard.id
+      }
+    }
+    case constants.SET_AUTHENTICATED: {
+      return {
+        ...state,
+        authenticated: action.payload.authenticated,
+        authData: action.payload.authData
+      }
     }
     default:
       return state

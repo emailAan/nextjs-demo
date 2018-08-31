@@ -1,4 +1,4 @@
 // config.js
 module.exports = {
-  'secret': 'supersecret'
+  'secret': '97DE4390A5C9D0E80490EE189E62F59588B7C83C413B0E60E318603A9A05D6F6'
 }

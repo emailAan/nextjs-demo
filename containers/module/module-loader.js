@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Typography from '@material-ui/core/Typography'
 
 import ModuleReact from '../../components/module-react'
 import ModuleAdf from '../../components/module-adf'
 import ModuleUrl from '../../components/module-url'
+import ModuleNotAvailable from '../../components/module-not-available'
 
 import {getModuleComponentUrl} from '../../utils/api'
 
@@ -19,14 +19,14 @@ class ModuleLoader extends React.Component {
       return <ModuleAdf {...this.props} customProps={this.props.customProps} />
     } else if (type === 'url') {
       return <ModuleUrl {...this.props} customProps={this.props.customProps} />
+    } else if (type === 'mna') {
+      return <ModuleNotAvailable {...this.props} />
     }
   }
 
   render () {
-    let {title} = this.props
     return (
       <div>
-        <Typography variant='headline' gutterBottom>{title}</Typography>
         { this.renderModule() }
       </div>
     )

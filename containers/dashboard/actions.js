@@ -4,6 +4,6 @@ export function initDashboard (dashboard) {
   return { type: constants.INIT_DASHBOARD, dashboard }
 }
 
-export function setModule (module, moduleMetaData, moduleParameters) {
-  return { type: constants.SET_MODULE, data: { module, moduleMetaData, moduleParameters } }
+export function setModule (module, moduleMetaData, moduleParameters, moduleTitle) {
+  return { type: constants.SET_MODULE, data: { module, moduleMetaData, moduleParameters, moduleTitle } }
 }

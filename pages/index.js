@@ -1,12 +1,14 @@
-import Typography from '@material-ui/core/Typography'
-import {Link} from '../utils/routes'
+import Main from '../containers/main'
+import { Link } from '../utils/routes'
 
 export default () => (
-  <div>
-    <Typography variant='headline' gutterBottom>Welkom bij Avinty POC-app</Typography>
-    <ul>
-      <li><Link route='selectie'><a>Selecteer een dashboard</a></Link></li>
-      <li><Link route='/d/4H7V9A2S'><a>Of ga naar jouw dash</a></Link></li>
-    </ul>
-  </div>
+  <Main
+    navigationItems={null}
+    contentTitle='Welkom bij Avinty POC-app'
+    content={(
+      <ul>
+        <li><Link route='selectie'><a>Selecteer een dashboard</a></Link></li>
+        <li><Link route='/d/4H7V9A2S'><a>Of ga naar jouw dash</a></Link></li>
+      </ul>
+    )} />
 )

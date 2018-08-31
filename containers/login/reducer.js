@@ -1,13 +1,9 @@
 import * as constants from './constants'
 
 const initialState = {
-  id: '',
-  title: 'Dashboard',
-  module: '',
-  moduleTitle: '',
-  moduleParameters: {},
-  moduleMetaData: {},
-  navData: []
+  jwtToken: null,
+  name: null,
+  username: null
 }
 
 const reducer = (state = initialState, action) => {

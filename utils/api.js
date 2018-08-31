@@ -9,3 +9,15 @@ export const moduleApiBaseUrl = `${apiBaseUrl}/modules`
 export const getModuleBaseUrl = (module) => `${moduleBaseUrl}/${module}`
 export const getModuleApiUrl = (module) => `${moduleApiBaseUrl}/${module}`
 export const getModuleComponentUrl = (module) => `${moduleBaseUrl}/${module}/component.js`
+
+export const apiGet = (url, jwt, headers) => {
+  const apiHeaders = headers || new Headers()
+
+  apiHeaders.append('x-access-token', jwt)
+
+  return fetch(url, {
+    method: 'GET',
+    headers: apiHeaders,
+    credentials: 'include'
+  })
+}
