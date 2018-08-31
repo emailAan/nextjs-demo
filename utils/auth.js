@@ -1,33 +1,49 @@
 import redirect from './redirect'
-import {LOGIN_URL} from './routes'
-import { setCookie, getCookie, removeCookie } from './session'
-import { authenticate, verify, logout } from '../services/authApi'
-// import { validateCredentials } from './validation'
+// import {LOGIN_URL} from './routes'
+import { setCookie, removeCookie } from './session'
+import { authenticate, verify, logout, refreshToken, refreshTokenOnServer } from '../services/authApi'
 
 const JWT_COOKIE_NAME = 'jwt'
 
-export const signIn = async (email, password, url) => {
-//   const error = validateCredentials(email, password)
-//   if (error) {
-//     return error
-//   }
-
+export const signIn = async (email, password) => {
   const res = await authenticate(email, password)
-  if (!res.jwt) {
-    return res
+  if (res.token) {
+    setCookie(JWT_COOKIE_NAME, res.token)
   }
 
-  setCookie(JWT_COOKIE_NAME, res.jwt)
-  redirect(url)
-  return null
+  return res
 }
 
-export const verifyJwt = async (ctx) => {
-  const jwt = getJwt(ctx)
-
+export const verifyJwt = async (jwt) => {
   const res = await verify(jwt)
 
   return res
+}
+
+export const refreshJwt = async (userId) => {
+  const res = await refreshToken(userId)
+  if (res.token) {
+    setCookie(JWT_COOKIE_NAME, res.token)
+  }
+
+  return res
+}
+
+export const refreshJwtOnServer = async (userId, refreshToken) => {
+  const res = await refreshTokenOnServer(userId, refreshToken)
+  if (res.token) {
+    setCookie(JWT_COOKIE_NAME, res.token)
+  }
+
+  return res
+}
+
+export const signOut = async (ctx = {}) => {
+  if (process.browser) {
+    removeCookie(JWT_COOKIE_NAME)
+    await logout()
+    redirect('/login', ctx)
+  }
 }
 
 // export const signUp = async (name, email, password, passwordConfirmation) => {
@@ -47,34 +63,26 @@ export const verifyJwt = async (ctx) => {
 //   return null
 // }
 
-export const signOut = async (ctx = {}) => {
-  if (process.browser) {
-    removeCookie(JWT_COOKIE_NAME)
-    await logout()
-    redirect('/login', ctx)
-  }
-}
+// export const getJwt = ctx => {
+//   return getCookie(JWT_COOKIE_NAME, ctx.req)
+// }
 
-export const getJwt = ctx => {
-  return getCookie(JWT_COOKIE_NAME, ctx.req)
-}
+// export const isAuthenticated = ctx => !!getJwt(ctx)
 
-export const isAuthenticated = ctx => !!getJwt(ctx)
+// export const redirectIfAuthenticated = (ctx) => {
+//   if (isAuthenticated(ctx)) {
+//     const redirectUrl = ctx.query.url || '/'
+//     redirect(redirectUrl, ctx)
+//     return true
+//   }
+//   return false
+// }
 
-export const redirectIfAuthenticated = (ctx) => {
-  if (isAuthenticated(ctx)) {
-    const redirectUrl = ctx.query.url || '/'
-    redirect(redirectUrl, ctx)
-    return true
-  }
-  return false
-}
-
-export const redirectIfNotAuthenticated = (ctx, url) => {
-  if (!isAuthenticated(ctx)) {
-    const redirectUrl = `${LOGIN_URL}?url=${url}`
-    redirect(redirectUrl, ctx)
-    return true
-  }
-  return false
-}
+// export const redirectIfNotAuthenticated = (ctx, url) => {
+//   if (!isAuthenticated(ctx)) {
+//     const redirectUrl = `${LOGIN_URL}?url=${url}`
+//     redirect(redirectUrl, ctx)
+//     return true
+//   }
+//   return false
+// }

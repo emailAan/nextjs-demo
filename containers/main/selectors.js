@@ -19,3 +19,7 @@
 export function getDashboardById ({main}, id) {
   return main.loadedDashboards[id]
 }
+
+export function isAuthenticated ({main}) {
+  return main.authenticated
+}

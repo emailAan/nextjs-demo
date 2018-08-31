@@ -7,10 +7,14 @@ import { Provider } from 'react-redux'
 
 import getPageContext from '../utils/getPageContext'
 import {LOGIN_URL} from '../utils/routes'
+import redirect from '../utils/redirect'
 import withRedux from 'next-redux-wrapper'
 import {initializeStore} from '../stores/store'
-import { redirectIfNotAuthenticated, redirectIfAuthenticated, verifyJwt } from '../utils/auth'
-import { SET_AUTHENTICATED } from '../containers/main/constants'
+import { refreshJwt, refreshJwtOnServer } from '../utils/auth'
+// import { SET_AUTHENTICATED } from '../containers/main/constants'
+import {isAuthenticated} from '../containers/main/selectors'
+import {setAuthentication} from '../containers/main/actions'
+import cookie from 'cookie'
 
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
@@ -35,23 +39,61 @@ class AvintyApp extends App {
 
   pageContext = null;
 
-  static async getInitialProps ({ Component, ctx, url, store, router }) {
+  static async getInitialProps ({ Component, ctx, url, router, isServer, req }) {
+    const onLoginPage = ctx.pathname === LOGIN_URL
+    const currentUrl = router.asPath
+    const userId = 'bdfcd820-aa2b-11e8-844f-bffd93302474'
+    let authenticated = isAuthenticated(ctx.store.getState())
+
     console.log('router', router.asPath)
-    if (ctx.pathname !== LOGIN_URL && redirectIfNotAuthenticated(ctx, router.asPath)) {
-      return {}
-    }
-    if (ctx.pathname === LOGIN_URL && redirectIfAuthenticated(ctx)) {
-      return {}
-    }
+    console.log('Is authenticated', authenticated)
 
-    // check on the server if the jwt token is valid and set state in redux
-    if (ctx.pathname !== LOGIN_URL) {
-      const res = await verifyJwt(ctx)
-      const authenticated = !!res.id
+    if (!authenticated) {
+      let res = {}
+      console.log(ctx.isServer)
+      if (ctx.isServer) {
+        const cookies = cookie.parse(ctx.req.headers ? ctx.req.headers.cookie : '')
+        console.log('cookies', cookies)
 
+        res = await refreshJwtOnServer(userId, cookies.refreshToken)
+      } else {
+        res = await refreshJwt(userId)
+      }
+
+      authenticated = res.auth
       const payload = { authenticated, authData: res }
-      ctx.store.dispatch({type: SET_AUTHENTICATED, payload})
+      console.log('payload', payload)
+
+      ctx.store.dispatch(setAuthentication(payload))
     }
+
+    if (onLoginPage && authenticated) {
+      const redirectUrl = ctx.query.url || '/'
+      console.log('redirecting to url', redirectUrl)
+      redirect(redirectUrl, ctx)
+    }
+
+    if (!onLoginPage && !authenticated) {
+      const redirectUrl = `${LOGIN_URL}?url=${currentUrl}`
+      console.log('redirecting to login page')
+      redirect(redirectUrl, ctx)
+    }
+
+    // if (ctx.pathname !== LOGIN_URL && redirectIfNotAuthenticated(ctx, router.asPath)) {
+    //   return {}
+    // }
+    // if (ctx.pathname === LOGIN_URL && redirectIfAuthenticated(ctx)) {
+    //   return {}
+    // }
+
+    // // check on the server if the jwt token is valid and set state in redux
+    // if (ctx.pathname !== LOGIN_URL) {
+    //   const res = await verifyJwt(ctx)
+    //   const authenticated = !!res.id
+
+    //   const payload = { authenticated, authData: res }
+    //   ctx.store.dispatch({type: SET_AUTHENTICATED, payload})
+    // }
 
     const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {}
     return { pageProps }

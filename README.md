@@ -8,6 +8,16 @@
  * Zoveel mogelijk 'pretty-url' (in de adresbalk) en zo weinig mogelijk info voor hackers. -> mogelijk een url genereren en bewaren in db/cache (redis?)
  * Meerdere dashboards tegelijk open, (natuurlijk) een zichtbaar.
 
+## Security
+* https cookie
+* securing tokens (refresh token en auth jwt token) where to save
+   => refreshToken in httpOnly cookie
+   => authToken in redux store
+* sanatize input (redirect url)
+
+
+
+
 
 
 

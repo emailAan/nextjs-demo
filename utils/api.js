@@ -11,13 +11,13 @@ export const getModuleApiUrl = (module) => `${moduleApiBaseUrl}/${module}`
 export const getModuleComponentUrl = (module) => `${moduleBaseUrl}/${module}/component.js`
 
 export const apiGet = (url, jwt, headers) => {
-  const apiHeaders = headers || new Headers()
-
-  apiHeaders.append('x-access-token', jwt)
-
+  console.log('jwt', jwt)
   return fetch(url, {
     method: 'GET',
-    headers: apiHeaders,
+    headers: {
+      ...(headers || {}),
+      'x-access-token': jwt
+    },
     credentials: 'include'
   })
 }

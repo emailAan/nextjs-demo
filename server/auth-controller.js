@@ -45,11 +45,21 @@ const findUserById = async (id) => {
   return users[id]
 }
 
-const createToken = (user) => {
-  return jwt.sign({ id: user.id }, config.secret, {
-    expiresIn: 86400
+/// /////////////////////////////////////
+
+const createAuthToken = (userId) => {
+  return jwt.sign({ id: userId }, config.secret, {
+    expiresIn: config.tokenLife
   })
 }
+
+const createRefreshToken = (userId) => {
+  return jwt.sign({ id: userId }, config.refreshTokenSecret, {
+    expiresIn: config.refreshTokenLife
+  })
+}
+
+/// router methods /////////////////////////////////////
 
 router.post('/register', (req, res) => {
   let hashedPassword = bcrypt.hashSync(req.body.password, 8)
@@ -63,7 +73,7 @@ router.post('/register', (req, res) => {
   }
 
   addUser(user)
-  var token = createToken(user)
+  var token = createAuthToken(user.id)
 
   res.status(200).send({ auth: true, token: token })
 })
@@ -71,43 +81,65 @@ router.post('/register', (req, res) => {
 router.get('/me', VerifyToken, async (req, res) => {
   const userWithPwd = await findUserById(req.userId)
 
-  if (!userWithPwd) return res.status(404).send('No user found.')
+  if (!userWithPwd) return res.status(404).send({ auth: false, message: 'No user found.' })
 
   if (userWithPwd != null) {
     delete userWithPwd.password
 
-    res.status(200).send(userWithPwd)
+    res.status(200).send({ auth: true, user: userWithPwd })
   }
 })
 
 router.post('/login', async (req, res) => {
   const user = await findUserByUsername(req.body.username)
 
-  if (!user) return res.status(404).send('No user found.')
+  if (!user) return res.status(404).send({ auth: false, message: 'No user found.' })
 
   var passwordIsValid = bcrypt.compareSync(req.body.password, user.password)
 
   if (!passwordIsValid) return res.status(401).send({ auth: false, token: null })
 
-  const expiryDate = new Date(Date.now() + 60 * 1000) // 8 hour
-  const sessionToken = createSessionToken()
-  res.cookie('sessionToken', sessionToken, {
-    maxAge: 900000,
+  const expiryDate = new Date(Date.now() + config.refreshTokenLife * 1000)
+  const refreshToken = createRefreshToken(user.id)
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: config.refreshTokenLife * 1000,
     httpOnly: true,
     expires: expiryDate
   })
 
-  const token = createToken(user)
-  res.status(200).send({ auth: true, token: token })
+  const authToken = createAuthToken(user.id)
+  res.status(200).send({ auth: true, token: authToken })
 })
-
-const createSessionToken = () => uuidv1()
 
 router.get('/logout', (req, res) => {
   res.clearCookie('sessionToken')
   res.clearCookie('jwt')
 
   res.status(200).send({ auth: false, token: null })
+})
+
+router.post('/refresh', (req, res) => {
+  console.log('Cookies: ', req.cookies)
+  console.log('body: ', req.body)
+  res.clearCookie('jwt')
+
+  const refreshToken = req.cookies.refreshToken || req.body.refreshToken
+  const userId = req.body.id
+
+  jwt.verify(refreshToken, config.refreshTokenSecret, (err, decoded) => {
+    if (err) {
+      console.log(err)
+      return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' })
+    }
+
+    if (userId !== decoded.id) {
+      return res.status(500).send({ auth: false, message: 'Wrong user id.' })
+    }
+
+    const authToken = createAuthToken(userId)
+    return res.status(200).send({ auth: true, token: authToken })
+  })
 })
 
 module.exports = router

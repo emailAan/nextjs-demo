@@ -1,6 +1,7 @@
 const express = require('express')
 const next = require('next')
 const helmet = require('helmet')
+const cookieParser = require('cookie-parser')
 const { modules, moduleApis } = require('./modules-proxy')
 const AuthController = require('./auth-controller')
 const routes = require('../utils/routes')
@@ -20,6 +21,7 @@ app.prepare()
   .then(() => {
     const server = express()
     server.use(helmet())
+    server.use(cookieParser())
 
     // setDashboardApi(server)
 

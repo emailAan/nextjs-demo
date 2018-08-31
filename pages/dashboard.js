@@ -42,8 +42,8 @@ class Dash extends React.Component {
     return {}
   }
 
-  static async getModule (module, parameters, jwt) {
-    const moduleMetaData = module ? await getModuleInfo(module, jwt) : null
+  static async getModule (module, parameters, token) {
+    const moduleMetaData = module ? await getModuleInfo(module, token) : null
     const moduleParameters = module ? convertParameters(parameters) : null
 
     return moduleMetaData
@@ -65,13 +65,13 @@ class Dash extends React.Component {
   }
 
   static async createDashboardDataFromQuery (query, dashboard, store) {
-    const jwt = store.getState().main.authData.jwt
-    let dashboardInfo = await getDashboardInfo(query.id, jwt)
+    const token = store.getState().main.authData.token
+    let dashboardInfo = await getDashboardInfo(query.id, token)
     dashboard = {
       navData: dashboardInfo.navData,
       title: dashboardInfo.title,
       id: query.id,
-      ...await Dash.getModule(query.module, query, jwt)
+      ...await Dash.getModule(query.module, query, token)
     }
     store.dispatch(newDashboard(dashboard))
 
@@ -82,7 +82,7 @@ class Dash extends React.Component {
     if (!newModule) {
       this.props.setModule()
     } else if (this.props.dashboard.module !== newModule) {
-      const module = await Dash.getModule(newModule, parameters, this.props.jwt)
+      const module = await Dash.getModule(newModule, parameters, this.props.token)
 
       this.props.setModule(newModule, module.moduleMetaData, module.moduleParameters, moduleTitle)
     }
@@ -137,9 +137,10 @@ class Dash extends React.Component {
 }
 
 const mapStateToProps = state => {
+  console.log(state.main.authData.token)
   return {
     dashboard: state.dashboard,
-    jwt: state.main.authData.jwt
+    token: state.main.authData.token
   }
 }
 

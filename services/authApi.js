@@ -1,5 +1,6 @@
 // import { post } from '../utils/request'
 import {apiBaseUrl} from '../utils/api'
+import 'url-search-params-polyfill'
 
 export const authenticate = async (username, password) => {
   const url = `${apiBaseUrl}/auth/login`
@@ -17,41 +18,73 @@ export const authenticate = async (username, password) => {
     body: data
   })
 
-  if (res.status === 200) {
-    const tokenReply = await res.json()
-    return {jwt: tokenReply.token}
-  } else {
-    return 'Ongeldige combinatie'
-  }
+  return res.json()
 }
 
 export const verify = async (jwt) => {
   const url = `${apiBaseUrl}/auth/me`
-  const myHeaders = new Headers()
+  // const myHeaders = new Headers()
 
-  myHeaders.append('Content-Type', 'application/json')
-  myHeaders.append('x-access-token', jwt)
+  // myHeaders.append('Content-Type', 'application/json')
+  // myHeaders.append('x-access-token', jwt)
 
   const res = await fetch(url, {
     method: 'GET',
-    headers: myHeaders,
+    // headers: myHeaders,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'x-access-token': jwt
+    },
     credentials: 'include'
   })
 
-  if (res.status === 200) {
-    const authData = await res.json()
-    authData.jwt = jwt
-    return authData
-  } else {
-    return res.status
-  }
+  return res.json()
 }
 
-export const logout = () => {
+export const logout = async () => {
   const url = `${apiBaseUrl}/auth/logout`
 
-  return fetch(url, {
+  const res = await fetch(url, {
     method: 'GET',
     credentials: 'include'
   })
+
+  return res.json()
+}
+
+export const refreshToken = async (userId) => {
+  const url = `${apiBaseUrl}/auth/refresh`
+
+  const data = new URLSearchParams()
+  data.append('id', userId)
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+    },
+    body: data,
+    credentials: 'include'
+  })
+
+  return res.json()
+}
+
+export const refreshTokenOnServer = async (userId, refreshToken) => {
+  const url = `${apiBaseUrl}/auth/refresh`
+
+  const data = new URLSearchParams()
+  data.append('id', userId)
+  data.append('refreshToken', refreshToken)
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+    },
+    body: data,
+    credentials: 'include'
+  })
+
+  return res.json()
 }

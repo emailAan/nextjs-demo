@@ -10,12 +10,12 @@ const configureStore = (initialState) => {
   let enhancer
   if (devtoolsAvailable) {
     enhancer = compose(
-      applyMiddleware(logger),
+      // applyMiddleware(logger),
       window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
     )
   } else {
     enhancer = compose(
-      applyMiddleware(logger)
+      // applyMiddleware(logger)
     )
   }
 
