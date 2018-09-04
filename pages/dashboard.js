@@ -12,29 +12,32 @@ import { initDashboard, setModule } from '../containers/dashboard/actions'
 import { newDashboard } from '../containers/main/actions'
 import { getDashboardById } from '../containers/main/selectors'
 import NavigationItem from '../components/navigation-item'
+import {withApiContext} from '../components/api-context'
 
 import { convertParameters, isServer } from '../utils'
-import { getModuleApiUrl, apiBaseUrl, apiGet } from '../utils/api'
+import { getModuleApiUrl, apiBaseUrl } from '../utils/api'
 import { openModule } from '../utils/routes'
 
-async function getDashboardInfo (id, jwt) {
-  const res = await apiGet(`${apiBaseUrl}/dashboard/${id}`, jwt)
+async function getDashboardInfo (apiCtx, id, jwt) {
+  const res = await apiCtx.apiGet(`${apiBaseUrl}/dashboard/${id}`, jwt)
 
   return (res.status === 200) ? res.json() : new Promise((resolve, reject) => resolve({}))
 }
 
-async function getModuleInfo (module, jwt) {
-  const res = await apiGet(getModuleApiUrl(module), jwt)
+async function getModuleInfo (apiCtx, module, jwt) {
+  const res = await apiCtx.apiGet(getModuleApiUrl(module), jwt)
 
   return (res.status === 200) ? res.json() : new Promise((resolve, reject) => resolve(null))
 }
 
 class Dash extends React.Component {
-  static async getInitialProps ({ store, query, req }) {
+  static async getInitialProps ({ store, query, req, apiCtx }) {
+    console.log('apiCtx: ', apiCtx)
+
     let dashboard = getDashboardById(store.getState(), query.id)
 
     if (isServer || !dashboard) {
-      dashboard = await Dash.createDashboardDataFromQuery(query, dashboard, store)
+      dashboard = await Dash.createDashboardDataFromQuery(apiCtx, query, dashboard, store)
     }
 
     store.dispatch(initDashboard(dashboard))
@@ -42,8 +45,8 @@ class Dash extends React.Component {
     return {}
   }
 
-  static async getModule (module, parameters, token) {
-    const moduleMetaData = module ? await getModuleInfo(module, token) : null
+  static async getModule (apiCtx, module, parameters, token) {
+    const moduleMetaData = module ? await getModuleInfo(apiCtx, module, token) : null
     const moduleParameters = module ? convertParameters(parameters) : null
 
     return moduleMetaData
@@ -64,14 +67,14 @@ class Dash extends React.Component {
       }
   }
 
-  static async createDashboardDataFromQuery (query, dashboard, store) {
+  static async createDashboardDataFromQuery (apiCtx, query, dashboard, store) {
     const token = store.getState().main.authData.token
-    let dashboardInfo = await getDashboardInfo(query.id, token)
+    let dashboardInfo = await getDashboardInfo(apiCtx, query.id, token)
     dashboard = {
       navData: dashboardInfo.navData,
       title: dashboardInfo.title,
       id: query.id,
-      ...await Dash.getModule(query.module, query, token)
+      ...await Dash.getModule(apiCtx, query.module, query, token)
     }
     store.dispatch(newDashboard(dashboard))
 
@@ -82,7 +85,7 @@ class Dash extends React.Component {
     if (!newModule) {
       this.props.setModule()
     } else if (this.props.dashboard.module !== newModule) {
-      const module = await Dash.getModule(newModule, parameters, this.props.token)
+      const module = await Dash.getModule(this.props.apiCtx, newModule, parameters, this.props.token)
 
       this.props.setModule(newModule, module.moduleMetaData, module.moduleParameters, moduleTitle)
     }
@@ -99,7 +102,7 @@ class Dash extends React.Component {
 
   renderItems () {
     let {navData} = this.props.dashboard
-
+    console.log(this.props)
     return (
       <Fragment>
         <ListItem button onClick={() => this.openContent()}>
@@ -137,7 +140,6 @@ class Dash extends React.Component {
 }
 
 const mapStateToProps = state => {
-  console.log(state.main.authData.token)
   return {
     dashboard: state.dashboard,
     token: state.main.authData.token
@@ -150,7 +152,12 @@ const mapDispatchToProps = {
   }
 }
 
-export default withRouter(connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Dash))
+export default
+withApiContext(
+  withRouter(
+    connect(
+      mapStateToProps,
+      mapDispatchToProps
+    )(Dash)
+  )
+)

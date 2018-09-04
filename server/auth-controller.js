@@ -13,6 +13,9 @@ const VerifyToken = require('./verify-token')
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
+const REFRESH_TOKEN = 'refreshToken'
+const JWT_TOKEN = 'jwt'
+
 const getUsers = async () => {
   const strUser = await client.get('users')
 
@@ -91,7 +94,8 @@ router.get('/me', VerifyToken, async (req, res) => {
 })
 
 router.post('/login', async (req, res) => {
-  const user = await findUserByUsername(req.body.username)
+  const username = req.bodyString('username')
+  const user = await findUserByUsername(username)
 
   if (!user) return res.status(404).send({ auth: false, message: 'No user found.' })
 
@@ -102,7 +106,7 @@ router.post('/login', async (req, res) => {
   const expiryDate = new Date(Date.now() + config.refreshTokenLife * 1000)
   const refreshToken = createRefreshToken(user.id)
 
-  res.cookie('refreshToken', refreshToken, {
+  res.cookie(REFRESH_TOKEN, refreshToken, {
     maxAge: config.refreshTokenLife * 1000,
     httpOnly: true,
     expires: expiryDate
@@ -113,31 +117,26 @@ router.post('/login', async (req, res) => {
 })
 
 router.get('/logout', (req, res) => {
-  res.clearCookie('sessionToken')
-  res.clearCookie('jwt')
+  console.log('clearing cookies')
+  res.clearCookie(REFRESH_TOKEN)
+  res.clearCookie(JWT_TOKEN)
 
   res.status(200).send({ auth: false, token: null })
 })
 
 router.post('/refresh', (req, res) => {
-  console.log('Cookies: ', req.cookies)
-  console.log('body: ', req.body)
-  res.clearCookie('jwt')
+  res.clearCookie(JWT_TOKEN)
 
-  const refreshToken = req.cookies.refreshToken || req.body.refreshToken
-  const userId = req.body.id
+  const refreshToken = req.cookies[REFRESH_TOKEN] || req.body[REFRESH_TOKEN]
+
+  if (!refreshToken) { return res.status(403).send({ auth: false, message: 'No token provided.' }) }
 
   jwt.verify(refreshToken, config.refreshTokenSecret, (err, decoded) => {
     if (err) {
-      console.log(err)
       return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' })
     }
 
-    if (userId !== decoded.id) {
-      return res.status(500).send({ auth: false, message: 'Wrong user id.' })
-    }
-
-    const authToken = createAuthToken(userId)
+    const authToken = createAuthToken(decoded.id)
     return res.status(200).send({ auth: true, token: authToken })
   })
 })

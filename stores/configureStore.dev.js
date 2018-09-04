@@ -1,4 +1,5 @@
 import { createStore, applyMiddleware, compose } from 'redux'
+import thunk from 'redux-thunk'
 
 import logger from '../services/logger-service'
 import rootReducer from '../reducers'
@@ -10,12 +11,12 @@ const configureStore = (initialState) => {
   let enhancer
   if (devtoolsAvailable) {
     enhancer = compose(
-      // applyMiddleware(logger),
+      applyMiddleware(thunk, logger),
       window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
     )
   } else {
     enhancer = compose(
-      // applyMiddleware(logger)
+      applyMiddleware(thunk, logger)
     )
   }
 

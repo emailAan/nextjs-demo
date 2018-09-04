@@ -26,6 +26,8 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 import Content from '../../components/content'
 import {signOut} from '../../utils/auth'
 import { swithDashboard, openAccount, Router } from '../../utils/routes'
+import {setAuthentication} from './actions'
+import redirect from '../../utils/redirect'
 
 const drawerWidth = 200
 
@@ -128,6 +130,15 @@ class Main extends React.Component {
     )
   }
 
+  async signOut () {
+    const res = await signOut()
+    const authenticated = res.auth
+    const payload = { authenticated, authData: res }
+    console.log(payload)
+    this.props.setAuthentication(payload)
+    redirect('/login', {})
+  }
+
   renderSidebar () {
     const { classes, navigationItems, dashboard } = this.props
 
@@ -174,7 +185,7 @@ class Main extends React.Component {
           </ListItemIcon>
           <ListItemText primary='Mijn gegevens' />
         </ListItem>
-        <ListItem button onClick={() => signOut()}>
+        <ListItem button onClick={() => this.signOut()}>
           <ListItemIcon>
             <LockIcon />
           </ListItemIcon>
@@ -248,6 +259,12 @@ const mapStateToProps = state => {
   }
 }
 
+const mapDispatchToProps = {
+  setAuthentication: (authInfo) => {
+    return setAuthentication(authInfo)
+  }
+}
+
 export default withStyles(styles)(connect(
-  mapStateToProps
+  mapStateToProps, mapDispatchToProps
 )(Main))

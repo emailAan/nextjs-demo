@@ -1,17 +1,12 @@
 import Main from '../containers/main'
-import { connect } from 'react-redux'
 
-const Account = (props) => {
-  const {username, name, id} = props.authData
+import Account from '../containers/account'
+
+const AccountPage = (props) => {
   return <Main
     contentTitle='Mijn gegevens'
-    content={`${username}-${name}-${id}`}
+    content={<Account />}
   />
 }
 
-const mapStateToProps = state => {
-  return { authData: state.main.authData }
-}
-export default connect(
-  mapStateToProps
-)(Account)
+export default AccountPage

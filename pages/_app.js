@@ -11,10 +11,11 @@ import redirect from '../utils/redirect'
 import withRedux from 'next-redux-wrapper'
 import {initializeStore} from '../stores/store'
 import { refreshJwt, refreshJwtOnServer } from '../utils/auth'
-// import { SET_AUTHENTICATED } from '../containers/main/constants'
+import {apiGet} from '../utils/api'
 import {isAuthenticated} from '../containers/main/selectors'
 import {setAuthentication} from '../containers/main/actions'
 import cookie from 'cookie'
+import {ApiProvider} from '../components/api-context'
 
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
@@ -39,33 +40,10 @@ class AvintyApp extends App {
 
   pageContext = null;
 
-  static async getInitialProps ({ Component, ctx, url, router, isServer, req }) {
+  static async getInitialProps ({ Component, ctx, url, router }) {
     const onLoginPage = ctx.pathname === LOGIN_URL
-    const currentUrl = router.asPath
-    const userId = 'bdfcd820-aa2b-11e8-844f-bffd93302474'
-    let authenticated = isAuthenticated(ctx.store.getState())
 
-    console.log('router', router.asPath)
-    console.log('Is authenticated', authenticated)
-
-    if (!authenticated) {
-      let res = {}
-      console.log(ctx.isServer)
-      if (ctx.isServer) {
-        const cookies = cookie.parse(ctx.req.headers ? ctx.req.headers.cookie : '')
-        console.log('cookies', cookies)
-
-        res = await refreshJwtOnServer(userId, cookies.refreshToken)
-      } else {
-        res = await refreshJwt(userId)
-      }
-
-      authenticated = res.auth
-      const payload = { authenticated, authData: res }
-      console.log('payload', payload)
-
-      ctx.store.dispatch(setAuthentication(payload))
-    }
+    let authenticated = await AvintyApp.checkAndRefreshToken(ctx, router)
 
     if (onLoginPage && authenticated) {
       const redirectUrl = ctx.query.url || '/'
@@ -74,29 +52,43 @@ class AvintyApp extends App {
     }
 
     if (!onLoginPage && !authenticated) {
-      const redirectUrl = `${LOGIN_URL}?url=${currentUrl}`
+      const redirectUrl = `${LOGIN_URL}?url=${router.asPath}`
       console.log('redirecting to login page')
       redirect(redirectUrl, ctx)
     }
 
-    // if (ctx.pathname !== LOGIN_URL && redirectIfNotAuthenticated(ctx, router.asPath)) {
-    //   return {}
-    // }
-    // if (ctx.pathname === LOGIN_URL && redirectIfAuthenticated(ctx)) {
-    //   return {}
-    // }
-
-    // // check on the server if the jwt token is valid and set state in redux
-    // if (ctx.pathname !== LOGIN_URL) {
-    //   const res = await verifyJwt(ctx)
-    //   const authenticated = !!res.id
-
-    //   const payload = { authenticated, authData: res }
-    //   ctx.store.dispatch({type: SET_AUTHENTICATED, payload})
-    // }
-
+    const apiCtx = AvintyApp.getApiContext(ctx.store.dispatch)
+    ctx.apiCtx = apiCtx
     const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {}
+
     return { pageProps }
+  }
+
+  static async checkAndRefreshToken (ctx) {
+    // Check if we already confirmed that we are authenticated.
+    if (isAuthenticated(ctx.store.getState())) {
+      return true
+    }
+
+    // Let's ask for a fresh JWT token
+    const res = await AvintyApp.refreshJwtToken(ctx)
+
+    // Save the result of the renewal of the JWT
+    ctx.store.dispatch(setAuthentication({ authenticated: res.auth, authData: res }))
+
+    return res.auth
+  }
+
+  static getRefreshTokenFromCookie ({headers}) {
+    return (!headers || !headers.cookie)
+      ? null
+      : cookie.parse(headers.cookie).refreshToken
+  }
+
+  static async refreshJwtToken ({isServer, req}) {
+    return isServer
+      ? refreshJwtOnServer(AvintyApp.getRefreshTokenFromCookie(req))
+      : refreshJwt()
   }
 
   componentDidMount () {
@@ -107,24 +99,50 @@ class AvintyApp extends App {
     }
   }
 
+  static getApiContext (dispatch) {
+    return {
+      refreshJwtToken: () => AvintyApp.refreshJwtToken({isServer: false}),
+      apiGet: async (url, jwt, headers) => {
+        let res = await apiGet(url, jwt, headers)
+
+        if (res.status === 401) {
+          const refreshRes = await AvintyApp.refreshJwtToken({isServer: false})
+
+          // Save the result of the renewal of the JWT
+          dispatch(setAuthentication({ authenticated: refreshRes.auth, authData: refreshRes }))
+
+          res = apiGet(url, refreshRes.token, headers)
+        }
+        return res
+      }
+
+    }
+  }
+
   render () {
+    console.log(this.props)
     const { Component, pageProps, store } = this.props
+
+    const apiCtx = AvintyApp.getApiContext(store.dispatch)
     return (
       <Container>
         <Provider
           store={store}>
-          <JssProvider
-            registry={this.pageContext.sheetsRegistry}
-            generateClassName={this.pageContext.generateClassName}>
-            <MuiThemeProvider
-              theme={this.pageContext.theme}
-              sheetsManager={this.pageContext.sheetsManager}>
-              <CssBaseline />
-              <Component
-                pageContext={this.pageContext}
-                {...pageProps} />
-            </MuiThemeProvider>
-          </JssProvider>
+          <ApiProvider value={apiCtx}>
+            <JssProvider
+              registry={this.pageContext.sheetsRegistry}
+              generateClassName={this.pageContext.generateClassName}>
+              <MuiThemeProvider
+                theme={this.pageContext.theme}
+                sheetsManager={this.pageContext.sheetsManager}>
+                <CssBaseline />
+                <Component
+                  pageContext={this.pageContext}
+                  apiCtx={apiCtx}
+                  {...pageProps} />
+              </MuiThemeProvider>
+            </JssProvider>
+          </ApiProvider>
         </Provider>
       </Container>
     )

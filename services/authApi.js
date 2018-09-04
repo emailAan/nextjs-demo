@@ -23,14 +23,8 @@ export const authenticate = async (username, password) => {
 
 export const verify = async (jwt) => {
   const url = `${apiBaseUrl}/auth/me`
-  // const myHeaders = new Headers()
-
-  // myHeaders.append('Content-Type', 'application/json')
-  // myHeaders.append('x-access-token', jwt)
-
   const res = await fetch(url, {
     method: 'GET',
-    // headers: myHeaders,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
       'x-access-token': jwt
@@ -52,29 +46,24 @@ export const logout = async () => {
   return res.json()
 }
 
-export const refreshToken = async (userId) => {
+export const refreshToken = async () => {
   const url = `${apiBaseUrl}/auth/refresh`
-
-  const data = new URLSearchParams()
-  data.append('id', userId)
 
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
     },
-    body: data,
     credentials: 'include'
   })
 
   return res.json()
 }
 
-export const refreshTokenOnServer = async (userId, refreshToken) => {
+export const refreshTokenOnServer = async (refreshToken) => {
   const url = `${apiBaseUrl}/auth/refresh`
 
   const data = new URLSearchParams()
-  data.append('id', userId)
   data.append('refreshToken', refreshToken)
 
   const res = await fetch(url, {

@@ -15,18 +15,8 @@
    => authToken in redux store
 * sanatize input (redirect url)
 
-
-
-
-
-
-
-
-
-
-
-
-
+* optie voor 2-way authentication
+* optie emailen nieuw ip gebruikt
 
 
 
@@ -90,7 +80,3 @@
 [Mon Jul 02 2018 21:18:31 GMT+0200 (Central European Summer Time)] INFO   95%      121 ms
 [Mon Jul 02 2018 21:18:31 GMT+0200 (Central European Summer Time)] INFO   99%      148 ms
 [Mon Jul 02 2018 21:18:31 GMT+0200 (Central European Summer Time)] INFO  100%      184 ms (longest request)
-
-
-
-

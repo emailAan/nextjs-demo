@@ -22,6 +22,7 @@ app.prepare()
     const server = express()
     server.use(helmet())
     server.use(cookieParser())
+    server.use(require('sanitize').middleware)
 
     // setDashboardApi(server)
 
