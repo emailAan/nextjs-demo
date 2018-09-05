@@ -1,9 +1,3 @@
-/*
-  @observable loadedDashboards = {}
-  @observable currentDashboardId
-  @observable title = 'Avinty'
-  @observable subTitle = 'ZORGVERNIEUWERS NET ALS JIJ'
-*/
 import * as constants from './constants'
 
 const initialState = {

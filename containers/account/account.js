@@ -1,15 +1,38 @@
+import React from 'react'
 import { connect } from 'react-redux'
-import {decodeJwt} from '../../utils/auth'
 
-const Account = (props) => {
-  const {username, name, id} = decodeJwt(props.authData.token)
-  return <div>{`${username}-${name}-${id}`}</div>
+import {getAccountInfo} from './actions'
+import {withApiContext} from '../../components/api-context'
+// import {decodeJwt} from '../../utils/auth'
+
+class Account extends React.Component {
+  componentDidMount () {
+    this.props.getAccountInfo(this.props.apiCtx)
+  }
+
+  render () {
+    const {username, name, id} = this.props.account
+    return <div>{`${username}-${name}-${id}`}</div>
+  }
 }
+
+// const Account = (props) => {
+//   const {username, name, id} = decodeJwt(props.authData.token)
+//   return <div>{`${username}-${name}-${id}`}</div>
+// }
 
 const mapStateToProps = state => {
-  return { authData: state.main.authData }
+  return { account: state.account }
 }
 
-export default connect(
-  mapStateToProps
-)(Account)
+const mapDispatchToProps = {
+  getAccountInfo: (apiCtx) => {
+    return getAccountInfo(apiCtx)
+  }
+}
+
+export default withApiContext(
+  connect(
+    mapStateToProps, mapDispatchToProps
+  )(Account)
+)
