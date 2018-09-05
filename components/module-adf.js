@@ -11,8 +11,15 @@ class ModuleAdf extends React.Component {
     this.state = {url: null}
   }
 
+  mounted = false
+
   componentDidMount () {
+    this.mounted = true
     this.fetchAdfSsoUrl(this.props)
+  }
+
+  componentWillUnmount () {
+    this.mounted = false
   }
 
   componentWillReceiveProps (nextProps) {
@@ -26,8 +33,8 @@ class ModuleAdf extends React.Component {
     const response = await fetch(`${getModuleBaseUrl('sso')}/sso?client=${client}&volgnummer=${inschrijving}&params=${paramsString}&module=${props.id}`)
 
     let url = (response.status === 200) ? await response.text() : ''
-
-    if (this._mounted) {
+    console.log('mounted:', this.mounted)
+    if (this.mounted) {
       this.setState({...this.state, url})
     }
   }
