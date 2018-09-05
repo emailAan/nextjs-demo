@@ -27,7 +27,9 @@ class ModuleAdf extends React.Component {
 
     let url = (response.status === 200) ? await response.text() : ''
 
-    this.setState({...this.state, url})
+    if (this._mounted) {
+      this.setState({...this.state, url})
+    }
   }
 
   render () {

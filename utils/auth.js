@@ -1,8 +1,7 @@
 import { setCookie, removeCookie } from './session'
 import { authenticate, verify, logout, refreshToken, refreshTokenOnServer } from '../services/authApi'
 
-const jwt = require('jsonwebtoken')
-const Promise = require('bluebird')
+import jwt from 'jsonwebtoken'
 
 const JWT_COOKIE_NAME = 'jwt'
 
@@ -47,55 +46,5 @@ export const signOut = async (ctx = {}) => {
 }
 
 export const decodeJwt = (token) => {
-  return new Promise((resolve, reject) => {
-    jwt.decode(token, (err, decode) => {
-      if (err) {
-        reject(err)
-        return
-      }
-
-      resolve(decode)
-    })
-  })
+  return jwt.decode(token)
 }
-
-// export const signUp = async (name, email, password, passwordConfirmation) => {
-//   const error = validateNewUser(name, email, password, passwordConfirmation)
-//   if (error) {
-//     return error
-//   }
-
-//   const res = await createUser(name, email, password, passwordConfirmation)
-
-//   if (!res.data) {
-//     return res
-//   }
-
-//   setCookie('success', `${name}, your account was created.`)
-//   redirect('/login')
-//   return null
-// }
-
-// export const getJwt = ctx => {
-//   return getCookie(JWT_COOKIE_NAME, ctx.req)
-// }
-
-// export const isAuthenticated = ctx => !!getJwt(ctx)
-
-// export const redirectIfAuthenticated = (ctx) => {
-//   if (isAuthenticated(ctx)) {
-//     const redirectUrl = ctx.query.url || '/'
-//     redirect(redirectUrl, ctx)
-//     return true
-//   }
-//   return false
-// }
-
-// export const redirectIfNotAuthenticated = (ctx, url) => {
-//   if (!isAuthenticated(ctx)) {
-//     const redirectUrl = `${LOGIN_URL}?url=${url}`
-//     redirect(redirectUrl, ctx)
-//     return true
-//   }
-//   return false
-// }

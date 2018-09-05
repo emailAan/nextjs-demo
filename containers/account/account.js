@@ -1,9 +1,8 @@
 import { connect } from 'react-redux'
-
-import {getJwtData} from './actions'
+import {decodeJwt} from '../../utils/auth'
 
 const Account = (props) => {
-  const {username, name, id} = getJwtData(props.authData.token)
+  const {username, name, id} = decodeJwt(props.authData.token)
   return <div>{`${username}-${name}-${id}`}</div>
 }
 
@@ -11,12 +10,6 @@ const mapStateToProps = state => {
   return { authData: state.main.authData }
 }
 
-const mapDispatchToProps = {
-  getJwtData: (jwt) => {
-    return getJwtData(jwt)
-  }
-}
-
 export default connect(
-  mapStateToProps, mapDispatchToProps
+  mapStateToProps
 )(Account)

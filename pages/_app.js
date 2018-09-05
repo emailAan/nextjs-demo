@@ -11,11 +11,10 @@ import redirect from '../utils/redirect'
 import withRedux from 'next-redux-wrapper'
 import {initializeStore} from '../stores/store'
 import { refreshJwt, refreshJwtOnServer } from '../utils/auth'
-import {apiGet} from '../utils/api'
 import {isAuthenticated} from '../containers/main/selectors'
 import {setAuthentication} from '../containers/main/actions'
 import cookie from 'cookie'
-import {ApiProvider} from '../components/api-context'
+import {ApiProvider, getApiContext} from '../components/api-context'
 
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
@@ -47,17 +46,15 @@ class AvintyApp extends App {
 
     if (onLoginPage && authenticated) {
       const redirectUrl = ctx.query.url || '/'
-      console.log('redirecting to url', redirectUrl)
       redirect(redirectUrl, ctx)
     }
 
     if (!onLoginPage && !authenticated) {
       const redirectUrl = `${LOGIN_URL}?url=${router.asPath}`
-      console.log('redirecting to login page')
       redirect(redirectUrl, ctx)
     }
 
-    const apiCtx = AvintyApp.getApiContext(ctx.store.dispatch)
+    const apiCtx = getApiContext(ctx.store)
     ctx.apiCtx = apiCtx
     const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {}
 
@@ -91,39 +88,42 @@ class AvintyApp extends App {
       : refreshJwt()
   }
 
+  sessionExpiredTimeout = null
+
   componentDidMount () {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side')
     if (jssStyles && jssStyles.parentNode) {
       jssStyles.parentNode.removeChild(jssStyles)
     }
+
+    this.setTimeoutSessionExpired()
   }
 
-  static getApiContext (dispatch) {
-    return {
-      refreshJwtToken: () => AvintyApp.refreshJwtToken({isServer: false}),
-      apiGet: async (url, jwt, headers) => {
-        let res = await apiGet(url, jwt, headers)
+  componentWillUnmount () {
+    clearTimeout(this.sessionExpiredTimeout)
+  }
 
-        if (res.status === 401) {
-          const refreshRes = await AvintyApp.refreshJwtToken({isServer: false})
+  async setTimeoutSessionExpired () {
+    // No need to check on the login page ;)
+    if (this.props.router.route !== LOGIN_URL) {
+      const res = await refreshJwt()
 
-          // Save the result of the renewal of the JWT
-          dispatch(setAuthentication({ authenticated: refreshRes.auth, authData: refreshRes }))
+      // Save the result of the renewal of the JWT
+      this.props.store.dispatch(setAuthentication({ authenticated: res.auth, authData: res }))
 
-          res = apiGet(url, refreshRes.token, headers)
-        }
-        return res
-      }
-
+      // It seems the session has expired, so redirect to the login page
+      if (!res.auth) { redirect(LOGIN_URL, {}) }
     }
+
+    const timeout = 900 /* jwt lifetime in seconds */ / 2 * 1000
+    this.sessionExpiredTimeout = setTimeout(this.setTimeoutSessionExpired.bind(this), timeout)
   }
 
   render () {
-    console.log(this.props)
     const { Component, pageProps, store } = this.props
 
-    const apiCtx = AvintyApp.getApiContext(store.dispatch)
+    const apiCtx = getApiContext(store)
     return (
       <Container>
         <Provider

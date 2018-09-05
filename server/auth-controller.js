@@ -133,7 +133,7 @@ router.post('/refresh', (req, res) => {
 
   jwt.verify(refreshToken, config.refreshTokenSecret, (err, decoded) => {
     if (err) {
-      return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' })
+      return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' })
     }
 
     const authToken = createAuthToken(decoded.id)
