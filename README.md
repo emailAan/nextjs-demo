@@ -1,5 +1,7 @@
 # nextjs-demo
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/justbrody/nextjs-demo.svg)](https://greenkeeper.io/)
+
 ## Uitgangspunten
 
  * Browser-state bewaren, maar na sluiten van de browser-tab moet de state opgeruimd zijn. -> sessionStorage
