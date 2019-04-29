@@ -1,0 +1,11 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "modules/agenda/package.json",
+        "modules/url-loader/package.json",
+        "package.json"
+      ]
+    }
+  }
+}
